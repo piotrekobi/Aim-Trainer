@@ -64,6 +64,21 @@
                     "result": 55
                 }
             ]
+        },
+        {
+            "nick": "asdfg",
+            "games": [
+                {
+                    "timestamp": 123123123,
+                    "mode": 2,
+                    "result": 1234
+                },
+                {
+                    "timestamp": 123123123,
+                    "mode": 3,
+                    "result": 1234
+                }
+            ]
         }
     ]
 }

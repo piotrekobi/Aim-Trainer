@@ -21,6 +21,7 @@ class Database:
             data = json.load(db)
         return data
 
+    # zwraca indeks użytkownika lub -1 jeżeli nie istnieje
     def _getUserIndex(self, nick):
         for i in range(len(self.database["Players"])):
             if self.database["Players"][i]["nick"] == nick:
