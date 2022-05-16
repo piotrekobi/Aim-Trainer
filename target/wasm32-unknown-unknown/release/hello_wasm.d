@@ -1,1 +1,1 @@
-C:\Users\kmaj1\hello-wasm\target\wasm32-unknown-unknown\release\hello_wasm.wasm: C:\Users\kmaj1\hello-wasm\src\lib.rs
+/Users/piotrpaturej/Projekty/studia/zpr/aim-trainer/target/wasm32-unknown-unknown/release/hello_wasm.wasm: /Users/piotrpaturej/Projekty/studia/zpr/aim-trainer/src/lib.rs
