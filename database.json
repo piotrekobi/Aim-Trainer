@@ -1,0 +1,84 @@
+{
+    "Players": [
+        {
+            "nick": "abc",
+            "games": [
+                {
+                    "timestamp": 123,
+                    "mode": 1,
+                    "result": 123
+                }
+            ]
+        },
+        {
+            "nick": "Maricpl",
+            "games": [
+                {
+                    "timestamp": 1231235,
+                    "mode": 2,
+                    "result": 123
+                },
+                {
+                    "timestamp": 1231235,
+                    "mode": 2,
+                    "result": 543
+                },
+                {
+                    "timestamp": 1231235,
+                    "mode": 3,
+                    "result": 11
+                },
+                {
+                    "timestamp": 1231235,
+                    "mode": 3,
+                    "result": 125
+                }
+            ]
+        },
+        {
+            "nick": "Ozzy",
+            "games": [
+                {
+                    "timestamp": 3455,
+                    "mode": 1,
+                    "result": 12
+                },
+                {
+                    "timestamp": 3455,
+                    "mode": 1,
+                    "result": 1212
+                },
+                {
+                    "timestamp": 3455,
+                    "mode": 3,
+                    "result": 444
+                }
+            ]
+        },
+        {
+            "nick": "MOulri",
+            "games": [
+                {
+                    "timestamp": 44,
+                    "mode": 1,
+                    "result": 55
+                }
+            ]
+        },
+        {
+            "nick": "asdfg",
+            "games": [
+                {
+                    "timestamp": 123123123,
+                    "mode": 2,
+                    "result": 1234
+                },
+                {
+                    "timestamp": 123123123,
+                    "mode": 3,
+                    "result": 1234
+                }
+            ]
+        }
+    ]
+}
