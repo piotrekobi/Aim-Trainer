@@ -64,11 +64,16 @@ Zainstaluj pytest:
 pip install pytest
 ```
 
-Testy jednostkowe serwera w pythonie 
-uruchamiane są komendą:
+Testy jednostkowe serwera w Pythonie:
+
+Należy najpierw zainstalować wykorzystywane moduły:
+
+```bash
+pip install -r requirements.txt
+```
+
+Uruchamiane są komendą:
 
 ```bash
 pytest
 ```
-
-
