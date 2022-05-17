@@ -31,3 +31,11 @@ npm start
 ```
 
 Aplikacja powinna być dostępna pod adresem [http://localhost:8080/](http://localhost:8080/)
+
+## Uruchamianie serwera
+
+Serwer uruchamiany poleceniem &uvicorn server:app
+
+(Należy zainstalować uvicorn: &pip install uvicorn)
+
+Api zostanie wystawione pod adresem localhost:8000, localhost:8000/docs - lista dostępnych operacji
