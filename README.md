@@ -34,14 +34,28 @@ Aplikacja powinna być dostępna pod adresem [http://localhost:8080/](http://loc
 
 ## Uruchamianie serwera
 
-Serwer uruchamiany poleceniem &uvicorn server:app
+Zainstaluj uvicorn:
 
-(Należy zainstalować uvicorn: &pip install uvicorn)
+```bash
+pip install uvicorn
+```
 
-Api zostanie wystawione pod adresem localhost:8000, localhost:8000/docs - lista dostępnych operacji
+Serwer uruchamiany poleceniem:
 
-## Testy serera
+```bash
+uvicorn server:app
+```
 
-Testy uruchamiamy poleceniem &pytest
+API zostanie wystawione pod adresem [http://localhost:8000/](http://localhost:8000/).
 
-(Należy zainstalować pytest: &pip install pytest)
+Na [localhost:8000/docs](localhost:8000/docs) znajduje się lista dostępnych operacji.
+
+## Uruchamianie testów jednostkowych
+
+Testy jednostkowe javascript uruchamiane są wewnątrz folderu www/ za pomocą komendy:
+
+```bash
+npm test
+```
+
+
