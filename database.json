@@ -79,6 +79,41 @@
                     "result": 1234
                 }
             ]
+        },
+        {
+            "nick": "Addal",
+            "games": [
+                {
+                    "timestamp": 131234,
+                    "mode": 5,
+                    "result": 5834
+                },
+                {
+                    "timestamp": 131234,
+                    "mode": 5,
+                    "result": 5834
+                }
+            ]
+        },
+        {
+            "nick": "asas",
+            "games": [
+                {
+                    "timestamp": 123,
+                    "mode": 123,
+                    "result": 123
+                }
+            ]
+        },
+        {
+            "nick": "Zony",
+            "games": [
+                {
+                    "timestamp": 883,
+                    "mode": 1,
+                    "result": 11
+                }
+            ]
         }
-    ]
+    ]                                   
 }
