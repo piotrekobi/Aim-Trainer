@@ -9,6 +9,7 @@ class Database:
             db_name = "database.json"
         self.db_name = db_name
         
+        #jezeli uda nam sie stworzyc, to znaczy ze nie ma jeszcze bazy danych
         try:
             with open(self.db_name, "x") as db:
                 self.database = {"Players": []}
@@ -28,11 +29,13 @@ class Database:
                 return i
         return -1
 
+    #jeżeli chcemy dodać użytkownika najpierw musimy sprawdzic czy taki przypadkiem nie istnieje
     def _addUserIfDoesntExist(self, nick):
         self.database["Players"].append({"nick": nick, "games": []})
         return len(self.database["Players"])-1
 
     def addUserData(self, nick, mode, timestamp, result):
+        #jezeli nie istnieje, tworzymy dla niego "Szkielet"
         nick_idx = self._getUserIndex(nick)
         if nick_idx == -1:
             nick_idx = self._addUserIfDoesntExist(nick)
