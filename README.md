@@ -57,3 +57,18 @@ Testy jednostkowe javascript uruchamiane są wewnątrz folderu www/ za pomocą 
 ```bash
 npm test
 ```
+
+Zainstaluj pytest:
+
+```bash
+pip install pytest
+```
+
+Testy jednostkowe serwera w pythonie 
+uruchamiane są komendą:
+
+```bash
+pytest
+```
+
+
