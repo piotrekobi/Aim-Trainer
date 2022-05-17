@@ -39,3 +39,9 @@ Serwer uruchamiany poleceniem &uvicorn server:app
 (Należy zainstalować uvicorn: &pip install uvicorn)
 
 Api zostanie wystawione pod adresem localhost:8000, localhost:8000/docs - lista dostępnych operacji
+
+## Testy serera
+
+Testy uruchamiamy poleceniem &pytest
+
+(Należy zainstalować pytest: &pip install pytest)
