@@ -125,6 +125,21 @@ function endMode() {
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("click", handleButtonClick);
     drawMenu();
+    var xhr = new XMLHttpRequest();
+
+
+    const a1gamer =  'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=1&result=' + points.toString();
+
+
+    xhr.open("POST", a1gamer, true);
+
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.send(JSON.stringify({
+
+        nick: ""
+
+    }));
     greet(points.toString());
     points = 0;
 }
