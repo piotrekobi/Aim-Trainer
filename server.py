@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import json
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 class Database:
 
@@ -55,27 +56,34 @@ class Database:
             return "User doesn't exist"
         return self.database["Players"][user_idx]
 
-database = Database()
-app = FastAPI()
 
-origins = ["*"]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-@app.get("/")
-async def root():
-    return {"message": "hello World"}
+if __name__ == "__main__":
+    app = FastAPI()
+    app.database = Database()
 
-@app.get("/user_data/{nick}")
-async def read_user(nick: str):
-    return {nick: database.getUserData(nick)}
+    app.origins = ["*"]
 
-@app.post("/user_data/")
-async def add_result(nick: str, timestamp: int, mode: int, result: int):
-    return database.addUserData(nick, mode, timestamp, result)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=app.origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/")
+    async def root():
+        return {"message": "hello World"}
+
+    @app.get("/user_data/{nick}")
+    async def read_user(nick: str):
+        return {nick: app.database.getUserData(nick)}
+
+    @app.post("/user_data/")
+    async def add_result(nick: str, timestamp: int, mode: int, result: int):
+        return app.database.addUserData(nick, mode, timestamp, result)
+        
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+

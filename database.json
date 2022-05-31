@@ -122,6 +122,16 @@
                     "timestamp": 1652822671,
                     "mode": 1,
                     "result": 13
+                },
+                {
+                    "timestamp": 1654020189,
+                    "mode": 1,
+                    "result": 10
+                },
+                {
+                    "timestamp": 1654023171,
+                    "mode": 1,
+                    "result": 11
                 }
             ]
         }
