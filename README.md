@@ -34,10 +34,10 @@ Aplikacja powinna być dostępna pod adresem [http://localhost:8080/](http://loc
 
 ## Uruchamianie serwera
 
-Zainstaluj uvicorn:
+Zainstaluj wykorzystywane moduły:
 
 ```bash
-pip install uvicorn
+pip install -r requirements.txt
 ```
 
 Serwer uruchamiany poleceniem:
@@ -56,12 +56,6 @@ Testy jednostkowe javascript uruchamiane są wewnątrz folderu www/ za pomocą 
 
 ```bash
 npm test
-```
-
-Zainstaluj pytest:
-
-```bash
-pip install pytest
 ```
 
 Testy jednostkowe serwera w Pythonie:
