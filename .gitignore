@@ -5,3 +5,4 @@ pkg/
 Cargo.lock
 wasm-pack.log
 .DS_Store
+__pycache__/
