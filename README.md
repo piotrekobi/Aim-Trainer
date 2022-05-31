@@ -43,7 +43,7 @@ pip install uvicorn
 Serwer uruchamiany poleceniem:
 
 ```bash
-uvicorn server:app
+python3 server.py
 ```
 
 API zostanie wystawione pod adresem [http://localhost:8000/](http://localhost:8000/).
