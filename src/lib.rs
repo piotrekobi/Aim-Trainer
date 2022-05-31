@@ -1,25 +1,33 @@
-mod utils;
-
+use rand::Rng;
 use wasm_bindgen::prelude::*;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 #[wasm_bindgen]
-pub struct Target {
-    radius: f32,
+extern "C" {
+    pub fn alert(s: &str);
 }
 
 #[wasm_bindgen]
-impl Target {
-    pub fn new() -> Target {
-        return Target { radius: 10.0 };
-    }
+pub fn greet(name: &str) {
+    alert(&format!("You gained {} points.", name));
+}
 
-    pub fn get_radius(&mut self) -> f32 {
-        return self.radius;
-    }
+#[wasm_bindgen]
+pub fn randint(min: i32, max: i32) -> i32 {
+    let mut rng = rand::thread_rng();
+    rng.gen_range(min..max)
+}
+
+#[wasm_bindgen]
+pub fn cursor_inside(
+    cursor_x: i32,
+    cursor_y: i32,
+    button_x: i32,
+    button_y: i32,
+    button_width: i32,
+    button_height: i32,
+) -> bool {
+    cursor_x >= button_x
+        && cursor_x <= button_x + button_width
+        && cursor_y >= button_y
+        && cursor_y <= button_y + button_height
 }
