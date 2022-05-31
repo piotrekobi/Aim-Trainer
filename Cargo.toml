@@ -7,8 +7,11 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/yourgithubusername/hello-wasm"
 edition = "2018"
 
+
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
+getrandom = { version = "0.2", features = ["js"] }
+rand = "0.8"

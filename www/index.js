@@ -1,4 +1,4 @@
-import { greet } from "aim-trainer";
+import { greet, cursor_inside, randint } from "aim-trainer";
 
 const canvas = document.getElementById("main-canvas");
 canvas.width = window.innerWidth / 1.7;
@@ -12,8 +12,8 @@ const BACKGROUND_COLOR = "#f5ab45"
 
 let ctx = canvas.getContext("2d");
 let points = 0;
-let x = getRandomInt(60, canvas.width - 60);
-let y = getRandomInt(60, canvas.height - 60);
+let x = randint(60, canvas.width - 60);
+let y = randint(60, canvas.height - 60);
 
 class MenuButton {
     constructor(index, text, color, highlightColor, func) {
@@ -42,12 +42,7 @@ class MenuButton {
     }
 
     cursorInside(x, y) {
-        return (
-            x >= this.x &&
-            x <= this.x + BUTTON_WIDTH &&
-            y >= this.y &&
-            y <= this.y + BUTTON_HEIGHT
-        );
+        return cursor_inside(x, y, this.x, this.y, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 }
 
@@ -114,8 +109,8 @@ const runMode = () => {
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     canvas.addEventListener("mousedown", handleMouseDown);
-    x = getRandomInt(60, canvas.width - 60);
-    y = getRandomInt(60, canvas.height - 60);
+    x = randint(60, canvas.width - 60);
+    y = randint(60, canvas.height - 60);
     drawTarget(x, y);
     setTimeout(endMode, 5000);
 }
@@ -128,7 +123,7 @@ function endMode() {
     var xhr = new XMLHttpRequest();
 
 
-    const a1gamer =  'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=1&result=' + points.toString();
+    const a1gamer = 'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=1&result=' + points.toString();
 
 
     xhr.open("POST", a1gamer, true);
@@ -190,11 +185,6 @@ function drawTarget(x, y) {
     fillCircle(x, y, 40, 'white');
     fillCircle(x, y, 20, 'red');
 }
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min;
-}
 
 function getMousePosition(canvas, event) {
     let rect = canvas.getBoundingClientRect();
@@ -203,8 +193,8 @@ function getMousePosition(canvas, event) {
     if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
         ctx.fillStyle = BACKGROUND_COLOR;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        x = getRandomInt(60, canvas.width - 60);
-        y = getRandomInt(60, canvas.height - 60);
+        x = randint(60, canvas.width - 60);
+        y = randint(60, canvas.height - 60);
         drawTarget(x, y);
         points++
     }
