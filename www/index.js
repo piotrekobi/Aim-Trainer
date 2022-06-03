@@ -46,6 +46,51 @@ class MenuButton {
     }
 }
 
+
+class Target {
+    constructor(x, y, size) {
+        this.size = size;
+        this.x = x;
+        this.y = y;
+        this.sizeRatio = 1;
+        this.destroyed = 0;
+        this.addTime = Date.now();
+    }
+
+    draw() {
+        fillCircle(this.x, this.y, this.size * this.sizeRatio, 'red');
+        fillCircle(this.x, this.y, this.size * 2 / 3 * this.sizeRatio, 'white');
+        fillCircle(this.x, this.y, this.size * 1 / 3 * this.sizeRatio, 'red');
+    }
+}
+class SurvivalMode {
+    constructor(lives, duration, interval, maxSize) {
+        this.lives = lives;
+        this.duration = duration;
+        this.interval = interval * 1000;
+        this.maxSize = maxSize;
+        this.lastTargetTime = Date.now() - this.interval;
+        this.targets = [];
+        this.updateTimer = setInterval(this.update.bind(this), 10);
+    }
+
+    update() {
+        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        console.log(Date.now() - this.lastTargetTime)
+        if (Date.now() - this.lastTargetTime > this.interval) {
+            this.lastTargetTime = Date.now();
+            this.targets.push(new Target(randint(0, canvas.width - this.maxSize), randint(0, canvas.height - this.maxSize), this.maxSize));
+        }
+        this.targets.forEach(target => {
+            target.sizeRatio = 1 - Math.abs((((Date.now() - target.addTime) / (this.interval / 2)) % 2) - 1);
+            console.log(target.sizeRatio)
+            target.draw()
+            console.log(target.size)
+        });
+    }
+}
+
 const testFunc = (text) => {
     console.log(text);
 };
@@ -115,6 +160,16 @@ const runMode = () => {
     setTimeout(endMode, 5000);
 }
 
+
+const runMode2 = () => {
+    canvas.removeEventListener("mousemove", handleMouseMove);
+    canvas.removeEventListener("click", handleButtonClick);
+    new SurvivalMode(3, 10, 5, 60);
+    // ctx.fillStyle = BACKGROUND_COLOR;
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+}
+
 function endMode() {
     canvas.removeEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
@@ -141,7 +196,7 @@ function endMode() {
 
 const menuButtons = [
     new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
-    new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", testFunc),
+    new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", runMode2),
     new MenuButton(2, "Tryb 3", "#008000", "#004000", testFunc),
     new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
 ];
