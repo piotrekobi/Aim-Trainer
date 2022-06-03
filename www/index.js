@@ -210,13 +210,11 @@ function handleMouseClick3(event) {
     if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
         canvas.removeEventListener("click", handleMouseClick3);
         let time_to_wait = randint(3000, 7000)
-        console.log(time_to_wait)
         setTimeout(handleFlickStart, time_to_wait);
     }
 }
 
 function handleFlickStart() {
-    console.log('flick')
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     time_start = Date.now();
@@ -227,15 +225,12 @@ function handleFlickStart() {
 }
 
 function handleClick3Flick(event) {
-    console.log('bbb')
     let rect = canvas.getBoundingClientRect();
     let mx = event.clientX - rect.left;
     let my = event.clientY - rect.top;
     if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
         points = points + Date.now() - time_start;
-        console.log(points)
         rounds --;
-        console.log(rounds)
         canvas.removeEventListener("click", handleClick3Flick);
         if (rounds<1) {
             endMode3();
