@@ -14,6 +14,9 @@ let ctx = canvas.getContext("2d");
 let points = 0;
 let x = randint(60, canvas.width - 60);
 let y = randint(60, canvas.height - 60);
+let time_start = 0;
+let time_to_wait = 3 * 1000;
+let rounds = 3;
 
 class MenuButton {
     constructor(index, text, color, highlightColor, func) {
@@ -139,10 +142,47 @@ function endMode() {
     points = 0;
 }
 
+const runMode3 = () => {
+    canvas.removeEventListener("mousemove", handleMouseMove);
+    canvas.removeEventListener("click", handleButtonClick);
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.addEventListener("click", handleMouseClick3);
+    points = 0;
+    rounds = 3;
+    x = canvas.width/2;
+    y = canvas.height/2;
+    drawTarget(x, y)
+    
+}
+
+
+function endMode3() {
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("click", handleButtonClick);
+    drawMenu();
+    var xhr = new XMLHttpRequest();
+
+
+    const a1gamer = 'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=3&result=' + points.toString();
+
+
+    xhr.open("POST", a1gamer, true);
+
+    xhr.setRequestHeader('Content-Type', 'application/json');
+
+    xhr.send(JSON.stringify({
+
+        nick: ""
+
+    }));
+    greet(points.toString());
+    points = 0;
+}
 const menuButtons = [
     new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
     new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", testFunc),
-    new MenuButton(2, "Tryb 3", "#008000", "#004000", testFunc),
+    new MenuButton(2, "Tryb 3", "#008000", "#004000", runMode3),
     new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
 ];
 
@@ -162,6 +202,56 @@ function handleMouseMove(event) {
 function handleMouseDown(event) {
     getMousePosition(canvas, event);
 }
+
+function handleMouseClick3(event) {
+    let rect = canvas.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
+    if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
+        canvas.removeEventListener("click", handleMouseClick3);
+        let time_to_wait = randint(3000, 7000)
+        console.log(time_to_wait)
+        setTimeout(handleFlickStart, time_to_wait);
+    }
+}
+
+function handleFlickStart() {
+    console.log('flick')
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    time_start = Date.now();
+    canvas.addEventListener("click", handleClick3Flick);  
+    x = randint(60, canvas.width - 60);
+    y = randint(60, canvas.height - 60);
+    drawTarget(x, y);
+}
+
+function handleClick3Flick(event) {
+    console.log('bbb')
+    let rect = canvas.getBoundingClientRect();
+    let mx = event.clientX - rect.left;
+    let my = event.clientY - rect.top;
+    if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
+        points = points + Date.now() - time_start;
+        console.log(points)
+        rounds --;
+        console.log(rounds)
+        canvas.removeEventListener("click", handleClick3Flick);
+        if (rounds<1) {
+            endMode3();
+        }
+        else {
+            ctx.fillStyle = BACKGROUND_COLOR;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            x = canvas.width/2;
+            y = canvas.height/2;
+            drawTarget(x, y);
+            canvas.addEventListener("click", handleMouseClick3);
+            
+        }
+    }
+}
+
 
 function handleButtonClick(event) {
     const boundingRect = canvas.getBoundingClientRect();
