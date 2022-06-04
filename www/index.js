@@ -1,23 +1,105 @@
 import { message, cursor_inside, randint } from "aim-trainer";
 
-const canvas = document.getElementById("main-canvas");
-canvas.width = window.innerWidth / 1.7;
-canvas.height = window.innerHeight / 1.3;
 
-const BUTTON_WIDTH = canvas.width - 100;
-const BUTTON_HEIGHT = 60;
 const BUTTON_SPACING = 30;
 const TOP_MARGIN = 200;
 const BACKGROUND_COLOR = "#f5ab45"
 
-let ctx = canvas.getContext("2d");
 let points = 0;
-let x = randint(60, canvas.width - 60);
-let y = randint(60, canvas.height - 60);
 let time_start = 0;
-let time_to_wait = 3 * 1000;
 let rounds = 3;
+class Game {
+    constructor() {
+        this.canvas = document.getElementById("main-canvas");
+        this.canvas.width = window.innerWidth / 1.7;
+        this.canvas.height = window.innerHeight / 1.3;
+        this.buttonWidth = this.canvas.width - 100;
+        this.buttonHeight = 60;
+        this.ctx = this.canvas.getContext("2d");
+    }
 
+    getCursorCoords(event) {
+        const boundingRect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / boundingRect.width;
+        const scaleY = this.canvas.height / boundingRect.height;
+
+        const x = (event.clientX - boundingRect.left) * scaleX;
+        const y = (event.clientY - boundingRect.top) * scaleY;
+        return [x, y];
+    }
+
+    drawBackground(color = BACKGROUND_COLOR) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+class Mode {
+    constructor() {
+        this.targets = [];
+        this.points = 0;
+        this.handleClick = this.handleClick.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+    }
+
+    run() {
+        game.canvas.addEventListener("click", this.handleClick);
+        game.canvas.addEventListener("mousemove", this.handleMouseMove);
+        this.drawTimer = setInterval(this.draw.bind(this), 10);
+    }
+
+    end() {
+        game.canvas.removeEventListener("click", this.handleClick);
+        game.canvas.removeEventListener("mousemove", this.handleMouseMove);
+        clearInterval(this.drawTimer);
+    }
+
+}
+
+class Menu extends Mode {
+    constructor() {
+        super();
+        this.buttons = [
+            new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
+            new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", runMode2),
+            new MenuButton(2, "Tryb 3", "#008000", "#004000", runMode3),
+            new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
+        ];
+    }
+    draw() {
+        game.drawBackground();
+        drawLogo();
+        drawCrosshair(game.canvas.width / 2, 100);
+        this.drawButtons();
+    }
+
+    handleClick(event) {
+        const [x, y] = game.getCursorCoords(event);
+        this.checkButtonClick(x, y);
+    }
+
+    handleMouseMove(event) {
+        const [x, y] = game.getCursorCoords(event);
+        this.checkButtonHighlight(x, y)
+    }
+
+    checkButtonHighlight(x, y) {
+        this.buttons.forEach(button => {
+            button.highlighted = button.cursorInside(x, y);
+        });
+    }
+
+    checkButtonClick(x, y) {
+        this.buttons.forEach(button => {
+            if (button.cursorInside(x, y))
+                button.func(button.text);
+        });
+    }
+
+    drawButtons() {
+        this.buttons.forEach((button) => button.draw());
+    }
+}
 class MenuButton {
     constructor(index, text, color, highlightColor, func) {
         this.index = index;
@@ -25,27 +107,27 @@ class MenuButton {
         this.color = color;
         this.hightlightColor = highlightColor;
         this.func = func;
-        this.x = canvas.width / 2 - BUTTON_WIDTH / 2;
-        this.y = (BUTTON_HEIGHT + BUTTON_SPACING) * this.index + TOP_MARGIN;
+        this.x = game.canvas.width / 2 - game.buttonWidth / 2;
+        this.y = (game.buttonHeight + BUTTON_SPACING) * this.index + TOP_MARGIN;
         this.highlighted = false;
     }
 
     draw() {
-        ctx.fillStyle = this.highlighted ? this.hightlightColor : this.color;
-        ctx.fillRect(this.x, this.y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        ctx.fillStyle = "white";
-        const fontSize = BUTTON_HEIGHT - 20;
-        ctx.font = `${fontSize}px Arial`;
-        ctx.textAlign = "center";
-        ctx.fillText(
+        game.ctx.fillStyle = this.highlighted ? this.hightlightColor : this.color;
+        game.ctx.fillRect(this.x, this.y, game.buttonWidth, game.buttonHeight);
+        game.ctx.fillStyle = "white";
+        const fontSize = game.buttonHeight - 20;
+        game.ctx.font = `${fontSize}px Arial`;
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
             this.text,
-            canvas.width / 2,
-            this.y + (BUTTON_HEIGHT / 2 + fontSize / 2 - fontSize / 7)
+            game.canvas.width / 2,
+            this.y + (game.buttonHeight / 2 + fontSize / 2 - fontSize / 7)
         );
     }
 
     cursorInside(x, y) {
-        return cursor_inside(x, y, this.x, this.y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        return cursor_inside(x, y, this.x, this.y, game.buttonWidth, game.buttonHeight);
     }
 }
 
@@ -86,11 +168,11 @@ class SurvivalMode {
 
     update() {
         ctx.fillStyle = BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
         this.drawLives();
         if (Date.now() - this.lastTargetTime > this.interval) {
             this.lastTargetTime = Date.now();
-            this.targets.push(new Target(randint(0 + this.maxSize, canvas.width - this.maxSize), randint(0 + this.maxSize, canvas.height - this.maxSize), this.maxSize, 4.0));
+            this.targets.push(new Target(randint(0 + this.maxSize, game.canvas.width - this.maxSize), randint(0 + this.maxSize, game.canvas.height - this.maxSize), this.maxSize, 4.0));
         }
         this.targets.forEach(target => {
             if (!target.destroyed) {
@@ -113,8 +195,8 @@ class SurvivalMode {
         ctx.textAlign = "center";
         ctx.fillText(
             `Lives: ${this.lives}`,
-            canvas.width / 2,
-            canvas.height / 5
+            game.canvas.width / 2,
+            game.canvas.height / 5
         );
     }
 
@@ -147,58 +229,40 @@ const testFunc = (text) => {
     console.log(text);
 };
 
-const drawMenu = () => {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawLogo();
-    drawCrosshair(canvas.width / 2, 100);
-    menuButtons.forEach((button) => button.draw());
-};
 
 const drawLogo = () => {
-    ctx.fillStyle = "black";
-    const fontSize = BUTTON_HEIGHT - 20;
-    ctx.font = "100px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(
+    game.ctx.fillStyle = "black";
+    const fontSize = game.buttonHeight - 20;
+    game.ctx.font = "100px Arial";
+    game.ctx.textAlign = "center";
+    game.ctx.fillText(
         "AIM",
-        canvas.width / 4,
+        game.canvas.width / 4,
         150
     )
-    ctx.font = "70px Arial";
+    game.ctx.font = "70px Arial";
 
-    ctx.fillText(
+    game.ctx.fillText(
         "TRAINER",
-        canvas.width - 170,
+        game.canvas.width - 170,
         140
     )
 }
 
 const drawCrosshair = (x, y) => {
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "red";
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(x, y, 50, 0, 2 * Math.PI);
-    ctx.stroke()
-    ctx.fillRect(x - 65, y - 5, 30, 10);
-    ctx.fillRect(x + 35, y - 5, 30, 10);
-    ctx.fillRect(x - 5, y - 65, 10, 30);
-    ctx.fillRect(x - 5, y + 35, 10, 30);
+    game.ctx.lineWidth = 5;
+    game.ctx.strokeStyle = "red";
+    game.ctx.fillStyle = "red";
+    game.ctx.beginPath();
+    game.ctx.arc(x, y, 50, 0, 2 * Math.PI);
+    game.ctx.stroke()
+    game.ctx.fillRect(x - 65, y - 5, 30, 10);
+    game.ctx.fillRect(x + 35, y - 5, 30, 10);
+    game.ctx.fillRect(x - 5, y - 65, 10, 30);
+    game.ctx.fillRect(x - 5, y + 35, 10, 30);
 }
 
-const checkButtonHighlight = (x, y) => {
-    menuButtons.forEach(button => {
-        button.highlighted = button.cursorInside(x, y);
-    });
-};
 
-const checkButtonClick = (x, y) => {
-    menuButtons.forEach(button => {
-        if (button.cursorInside(x, y))
-            button.func(button.text);
-    });
-}
 
 const runMode = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
@@ -218,10 +282,6 @@ const runMode2 = () => {
     canvas.removeEventListener("click", handleButtonClick);
     let mode = new SurvivalMode(3, 0.5, 30);
     canvas.addEventListener("click", mode.handleClick);
-
-    // ctx.fillStyle = BACKGROUND_COLOR;
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 }
 
 function endMode() {
@@ -285,25 +345,6 @@ function endMode3() {
     message(`Score: ${points}`);
     points = 0;
 }
-const menuButtons = [
-    new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
-    new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", runMode2),
-    new MenuButton(2, "Tryb 3", "#008000", "#004000", runMode3),
-    new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
-];
-
-function handleMouseMove(event) {
-    const boundingRect = canvas.getBoundingClientRect();
-
-    const scaleX = canvas.width / boundingRect.width;
-    const scaleY = canvas.height / boundingRect.height;
-
-    const x = (event.clientX - boundingRect.left) * scaleX;
-    const y = (event.clientY - boundingRect.top) * scaleY;
-
-    checkButtonHighlight(x, y);
-    drawMenu();
-}
 
 function handleMouseDown(event) {
     getMousePosition(canvas, event);
@@ -353,18 +394,6 @@ function handleClick3Flick(event) {
     }
 }
 
-
-function handleButtonClick(event) {
-    const boundingRect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / boundingRect.width;
-    const scaleY = canvas.height / boundingRect.height;
-
-    const x = (event.clientX - boundingRect.left) * scaleX;
-    const y = (event.clientY - boundingRect.top) * scaleY;
-
-    checkButtonClick(x, y);
-}
-
 function fillCircle(x, y, radius, color) {
     ctx.fillStyle = color;
     ctx.beginPath();
@@ -391,7 +420,6 @@ function getMousePosition(canvas, event) {
     }
 }
 
-canvas.addEventListener("mousemove", handleMouseMove)
-canvas.addEventListener("click", handleButtonClick);
-
-drawMenu();
+var game = new Game();
+game.currentMode = new Menu();
+game.currentMode.run();
