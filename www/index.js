@@ -144,6 +144,70 @@ class SurvivalMode {
     }
 }
 
+class ClickMode {
+    constructor(timeToEnd) {
+        this.startTime = Date.now();
+        this.timeToEnd = timeToEnd * 1000;
+        this.updateTimer = setInterval(this.update.bind(this), 10);
+        this.handleClick = this.handleClick.bind(this);
+        this.points = 0;
+        this.x = randint(60, canvas.width - 60);
+        this.y = randint(60, canvas.height - 60);
+        this.drawTarget(this.x, this.y);
+    }
+
+    update() {
+        if (Date.now() > this.startTime + this.timeToEnd){
+            this.end();
+        }
+        this.drawPoints();
+    }
+
+    drawTarget(x, y) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        fillCircle(x, y, 60, 'red');
+        fillCircle(x, y, 40, 'white');
+        fillCircle(x, y, 20, 'red');
+    }
+
+    drawPoints() {
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText(
+            `Points: ${this.points}`,
+            canvas.width / 2,
+            canvas.height + 50
+        );
+    }
+
+    handleClick(event) {
+        let rect = canvas.getBoundingClientRect();
+        let mx = event.clientX - rect.left;
+        let my = event.clientY - rect.top;
+        console.log(mx);
+        console.log(my);
+        console.log(this.x);
+        console.log(this.y);
+        if (Math.sqrt(Math.pow(this.x - mx, 2) + Math.pow(this.y - my, 2)) <= 60) {
+            this.x = randint(60, canvas.width - 60);
+            this.y = randint(60, canvas.height - 60);
+            this.drawTarget(this.x, this.y);
+            this.points += 1;
+        }
+    }
+
+    end() {
+        clearInterval(this.updateTimer);
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.addEventListener("mousemove", handleMouseMove);
+        canvas.addEventListener("click", handleButtonClick);
+        drawMenu();
+        message(`Your score: ${this.points}`);
+    }
+}
+
 class ReactionMode {
     constructor(iterations, minWaitTime, maxWaitTime) {
         this.iterations = iterations;
@@ -215,8 +279,8 @@ class ReactionMode {
             }
             this.startTime = Date.now();
             if (this.doneIterations == this.iterations){
+                this.update()
                 this.end()
-                message(`Your score: ${this.points}`);
             }
         }
     }
@@ -227,6 +291,7 @@ class ReactionMode {
         canvas.addEventListener("mousemove", handleMouseMove);
         canvas.addEventListener("click", handleButtonClick);
         drawMenu();
+        message(`Your score: ${this.points}`);
     }
 }
 
@@ -290,15 +355,12 @@ const checkButtonClick = (x, y) => {
 const runMode = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
     canvas.removeEventListener("click", handleButtonClick);
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    canvas.addEventListener("mousedown", handleMouseDown);
-    x = randint(60, canvas.width - 60);
-    y = randint(60, canvas.height - 60);
-    drawTarget(x, y);
-    setTimeout(endMode, 5000);
-}
+    let mode = new ClickMode(5);
+    canvas.addEventListener("click", mode.handleClick);
 
+    // ctx.fillStyle = BACKGROUND_COLOR;
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
 
 const runMode2 = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
@@ -466,11 +528,6 @@ function fillCircle(x, y, radius, color) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
-}
-function drawTarget(x, y) {
-    fillCircle(x, y, 60, 'red');
-    fillCircle(x, y, 40, 'white');
-    fillCircle(x, y, 20, 'red');
 }
 
 function getMousePosition(canvas, event) {
