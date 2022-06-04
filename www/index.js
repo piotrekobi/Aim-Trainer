@@ -1,23 +1,122 @@
 import { message, cursor_inside, randint } from "aim-trainer";
 
-const canvas = document.getElementById("main-canvas");
-canvas.width = window.innerWidth / 1.7;
-canvas.height = window.innerHeight / 1.3;
 
-const BUTTON_WIDTH = canvas.width - 100;
-const BUTTON_HEIGHT = 60;
 const BUTTON_SPACING = 30;
 const TOP_MARGIN = 200;
 const BACKGROUND_COLOR = "#f5ab45"
 
-let ctx = canvas.getContext("2d");
 let points = 0;
-let x = randint(60, canvas.width - 60);
-let y = randint(60, canvas.height - 60);
 let time_start = 0;
-let time_to_wait = 3 * 1000;
 let rounds = 3;
+class Game {
+    constructor() {
+        this.canvas = document.getElementById("main-canvas");
+        this.canvas.width = window.innerWidth / 1.7;
+        this.canvas.height = window.innerHeight / 1.3;
+        this.buttonWidth = this.canvas.width - 100;
+        this.buttonHeight = 60;
+        this.ctx = this.canvas.getContext("2d");
+    }
 
+    getCursorCoords(event) {
+        const boundingRect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / boundingRect.width;
+        const scaleY = this.canvas.height / boundingRect.height;
+
+        const x = (event.clientX - boundingRect.left) * scaleX;
+        const y = (event.clientY - boundingRect.top) * scaleY;
+        return [x, y];
+    }
+
+    drawBackground(color = BACKGROUND_COLOR) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+class Mode {
+    constructor() {
+        this.points = 0;
+        this.handleClick = this.handleClick.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+    }
+
+    run() {
+        game.canvas.addEventListener("click", this.handleClick);
+        game.canvas.addEventListener("mousemove", this.handleMouseMove);
+        this.drawTimer = setInterval(this.draw.bind(this), 10);
+    }
+
+    end(message_text = null) {
+        game.canvas.removeEventListener("click", this.handleClick);
+        game.canvas.removeEventListener("mousemove", this.handleMouseMove);
+        clearInterval(this.drawTimer);
+        if (message_text)
+            message(message_text);
+
+        if (!(game.currentMode instanceof Menu)) {
+            game.currentMode = new Menu();
+            game.currentMode.run();
+        }
+
+    }
+
+    handleClick(event) {
+    }
+
+    handleMouseMove(event) {
+    }
+
+}
+
+class Menu extends Mode {
+    constructor() {
+        super();
+        this.buttons = [
+            new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", "TimeMode", []),
+            new MenuButton(1, "Survival", "#0000FF", "#0000AA", SurvivalMode, [3, 0.5, 30]),
+            new MenuButton(2, "Flick Training", "#008000", "#004000", "FlickMode", []),
+            new MenuButton(3, "Reaction Time", "#000000", "#333333", "ReactionMode", []),
+        ];
+        this.logo = new Logo();
+
+    }
+    draw() {
+        game.drawBackground();
+        this.logo.draw();
+        this.drawButtons();
+    }
+
+    handleClick(event) {
+        const [x, y] = game.getCursorCoords(event);
+        this.checkButtonClick(x, y);
+    }
+
+    handleMouseMove(event) {
+        const [x, y] = game.getCursorCoords(event);
+        this.checkButtonHighlight(x, y)
+    }
+
+    checkButtonHighlight(x, y) {
+        this.buttons.forEach(button => {
+            button.highlighted = button.cursorInside(x, y);
+        });
+    }
+
+    checkButtonClick(x, y) {
+        this.buttons.forEach(button => {
+            if (button.cursorInside(x, y)) {
+                this.end();
+                game.currentMode = new button.mode(...button.modeArgs);
+                game.currentMode.run()
+            }
+
+        });
+    }
+    drawButtons() {
+        this.buttons.forEach((button) => button.draw());
+    }
+}
 class Drawable {
     constructor() {
     }
@@ -26,41 +125,41 @@ class Drawable {
     }
 }
 
-
-class MenuButton extends Drawable{
-    constructor(index, text, color, highlightColor, func) {
+class MenuButton extends Drawable {
+    constructor(index, text, color, highlightColor, mode, modeArgs) {
         super();
         this.index = index;
         this.text = text;
         this.color = color;
         this.hightlightColor = highlightColor;
-        this.func = func;
-        this.x = canvas.width / 2 - BUTTON_WIDTH / 2;
-        this.y = (BUTTON_HEIGHT + BUTTON_SPACING) * this.index + TOP_MARGIN;
+        this.mode = mode;
+        this.modeArgs = modeArgs;
+        this.x = game.canvas.width / 2 - game.buttonWidth / 2;
+        this.y = (game.buttonHeight + BUTTON_SPACING) * this.index + TOP_MARGIN;
         this.highlighted = false;
     }
 
     draw() {
-        ctx.fillStyle = this.highlighted ? this.hightlightColor : this.color;
-        ctx.fillRect(this.x, this.y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        ctx.fillStyle = "white";
-        const fontSize = BUTTON_HEIGHT - 20;
-        ctx.font = `${fontSize}px Arial`;
-        ctx.textAlign = "center";
-        ctx.fillText(
+        game.ctx.fillStyle = this.highlighted ? this.hightlightColor : this.color;
+        game.ctx.fillRect(this.x, this.y, game.buttonWidth, game.buttonHeight);
+        game.ctx.fillStyle = "white";
+        const fontSize = game.buttonHeight - 20;
+        game.ctx.font = `${fontSize}px Arial`;
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
             this.text,
-            canvas.width / 2,
-            this.y + (BUTTON_HEIGHT / 2 + fontSize / 2 - fontSize / 7)
+            game.canvas.width / 2,
+            this.y + (game.buttonHeight / 2 + fontSize / 2 - fontSize / 7)
         );
     }
 
     cursorInside(x, y) {
-        return cursor_inside(x, y, this.x, this.y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        return cursor_inside(x, y, this.x, this.y, game.buttonWidth, game.buttonHeight);
     }
 }
 
 
-class Target extends Drawable{
+class Target extends Drawable {
     constructor(x, y, size, lifeTime = null) {
         super();
         this.size = size;
@@ -74,9 +173,16 @@ class Target extends Drawable{
     }
 
     draw() {
-        fillCircle(this.x, this.y, this.size * this.sizeRatio, 'red');
-        fillCircle(this.x, this.y, this.size * 2 / 3 * this.sizeRatio, 'white');
-        fillCircle(this.x, this.y, this.size * 1 / 3 * this.sizeRatio, 'red');
+        this.fillCircle(this.x, this.y, this.size * this.sizeRatio, 'red');
+        this.fillCircle(this.x, this.y, this.size * 2 / 3 * this.sizeRatio, 'white');
+        this.fillCircle(this.x, this.y, this.size * 1 / 3 * this.sizeRatio, 'red');
+    }
+
+    fillCircle(x, y, radius, color) {
+        game.ctx.fillStyle = color;
+        game.ctx.beginPath();
+        game.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        game.ctx.fill();
     }
 
     hit(x, y) {
@@ -91,57 +197,56 @@ class Logo extends Drawable {
     }
 
     drawCrosshair() {
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "red";
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        let a = canvas.width/2;
+        game.ctx.lineWidth = 5;
+        game.ctx.strokeStyle = "red";
+        game.ctx.fillStyle = "red";
+        game.ctx.beginPath();
+        let a = game.canvas.width / 2;
         let b = 100;
-        ctx.arc(a, b, 50, 0, 2 * Math.PI);
-        ctx.stroke()
-        ctx.fillRect(a - 65, b - 5, 30, 10);
-        ctx.fillRect(a + 35, b - 5, 30, 10);
-        ctx.fillRect(a - 5, b - 65, 10, 30);
-        ctx.fillRect(a - 5, b + 35, 10, 30);
+        game.ctx.arc(a, b, 50, 0, 2 * Math.PI);
+        game.ctx.stroke()
+        game.ctx.fillRect(a - 65, b - 5, 30, 10);
+        game.ctx.fillRect(a + 35, b - 5, 30, 10);
+        game.ctx.fillRect(a - 5, b - 65, 10, 30);
+        game.ctx.fillRect(a - 5, b + 35, 10, 30);
     }
     drawBackground() {
-        ctx.fillStyle = "black";
-        const fontSize = BUTTON_HEIGHT - 20;
-        ctx.font = "100px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(
-        "AIM",
-        canvas.width / 4,
-        150
+        game.ctx.fillStyle = "black";
+        const fontSize = game.buttonHeight - 20;
+        game.ctx.font = "100px Arial";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            "AIM",
+            game.canvas.width / 4,
+            150
         )
-        ctx.font = "70px Arial";
+        game.ctx.font = "70px Arial";
 
-        ctx.fillText(
-        "TRAINER",
-        canvas.width - 170,
-        140
+        game.ctx.fillText(
+            "TRAINER",
+            game.canvas.width - 170,
+            140
         )
     }
 }
-class SurvivalMode {
+class SurvivalMode extends Mode {
     constructor(lives, interval, maxSize) {
+        super();
         this.lives = lives;
         this.startTime = Date.now();
         this.interval = interval * 1000;
         this.maxSize = maxSize;
         this.lastTargetTime = Date.now() - this.interval;
         this.targets = [];
-        this.updateTimer = setInterval(this.update.bind(this), 10);
-        this.handleClick = this.handleClick.bind(this);
     }
 
-    update() {
-        ctx.fillStyle = BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    draw() {
+        game.ctx.fillStyle = BACKGROUND_COLOR;
+        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
         this.drawLives();
         if (Date.now() - this.lastTargetTime > this.interval) {
             this.lastTargetTime = Date.now();
-            this.targets.push(new Target(randint(0 + this.maxSize, canvas.width - this.maxSize), randint(0 + this.maxSize, canvas.height - this.maxSize), this.maxSize, 4.0));
+            this.targets.push(new Target(randint(0 + this.maxSize, game.canvas.width - this.maxSize), randint(0 + this.maxSize, game.canvas.height - this.maxSize), this.maxSize, 4.0));
         }
         this.targets.forEach(target => {
             if (!target.destroyed) {
@@ -155,70 +260,33 @@ class SurvivalMode {
             }
         });
         if (!this.lives > 0)
-            this.end();
+            this.end(`Time survived: ${(Date.now() - this.startTime) / 1000} seconds`);
 
     }
 
     drawLives() {
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.fillText(
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
             `Lives: ${this.lives}`,
-            canvas.width / 2,
-            canvas.height / 5
+            game.canvas.width / 2,
+            game.canvas.height / 5
         );
     }
 
     handleClick(event) {
-        let rect = canvas.getBoundingClientRect();
+        let rect = game.canvas.getBoundingClientRect();
         let mx = event.clientX - rect.left;
         let my = event.clientY - rect.top;
-        for (let i = 0; i < this.targets.length; i++) {
-            if (this.targets[i].hit(mx, my)) {
-                console.log("a")
-                this.targets[i].destroyed = true;
-                break;
+        this.targets.forEach(target => {
+            if (target.hit(mx, my)) {
+                target.destroyed = true;
             }
-        }
+        });
+        this.targets = this.targets.filter(target => target.destroyed == false);
     }
-
-    end() {
-        clearInterval(this.updateTimer);
-        canvas.removeEventListener("mousedown", handleMouseDown);
-        canvas.addEventListener("mousemove", handleMouseMove);
-        canvas.addEventListener("click", handleButtonClick);
-        drawMenu();
-        message(`Time survived: ${(Date.now() - this.startTime) / 1000} seconds`);
-    }
-
-
 }
 
-const testFunc = (text) => {
-    console.log(text);
-};
-
-const drawMenu = () => {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    let logo = new Logo()
-    logo.draw()
-    menuButtons.forEach((button) => button.draw());
-};
-
-
-const checkButtonHighlight = (x, y) => {
-    menuButtons.forEach(button => {
-        button.highlighted = button.cursorInside(x, y);
-    });
-};
-
-const checkButtonClick = (x, y) => {
-    menuButtons.forEach(button => {
-        if (button.cursorInside(x, y))
-            button.func(button.text);
-    });
-}
 
 const runMode = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
@@ -230,18 +298,6 @@ const runMode = () => {
     y = randint(60, canvas.height - 60);
     drawTarget(x, y);
     setTimeout(endMode, 5000);
-}
-
-
-const runMode2 = () => {
-    canvas.removeEventListener("mousemove", handleMouseMove);
-    canvas.removeEventListener("click", handleButtonClick);
-    let mode = new SurvivalMode(3, 0.5, 30);
-    canvas.addEventListener("click", mode.handleClick);
-
-    // ctx.fillStyle = BACKGROUND_COLOR;
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
-
 }
 
 function endMode() {
@@ -305,25 +361,6 @@ function endMode3() {
     message(`Score: ${points}`);
     points = 0;
 }
-const menuButtons = [
-    new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
-    new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", runMode2),
-    new MenuButton(2, "Tryb 3", "#008000", "#004000", runMode3),
-    new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
-];
-
-function handleMouseMove(event) {
-    const boundingRect = canvas.getBoundingClientRect();
-
-    const scaleX = canvas.width / boundingRect.width;
-    const scaleY = canvas.height / boundingRect.height;
-
-    const x = (event.clientX - boundingRect.left) * scaleX;
-    const y = (event.clientY - boundingRect.top) * scaleY;
-
-    checkButtonHighlight(x, y);
-    drawMenu();
-}
 
 function handleMouseDown(event) {
     getMousePosition(canvas, event);
@@ -373,30 +410,6 @@ function handleClick3Flick(event) {
     }
 }
 
-
-function handleButtonClick(event) {
-    const boundingRect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / boundingRect.width;
-    const scaleY = canvas.height / boundingRect.height;
-
-    const x = (event.clientX - boundingRect.left) * scaleX;
-    const y = (event.clientY - boundingRect.top) * scaleY;
-
-    checkButtonClick(x, y);
-}
-
-function fillCircle(x, y, radius, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fill();
-}
-function drawTarget(x, y) {
-    fillCircle(x, y, 60, 'red');
-    fillCircle(x, y, 40, 'white');
-    fillCircle(x, y, 20, 'red');
-}
-
 function getMousePosition(canvas, event) {
     let rect = canvas.getBoundingClientRect();
     let mx = event.clientX - rect.left;
@@ -411,7 +424,6 @@ function getMousePosition(canvas, event) {
     }
 }
 
-canvas.addEventListener("mousemove", handleMouseMove)
-canvas.addEventListener("click", handleButtonClick);
-
-drawMenu();
+var game = new Game();
+game.currentMode = new Menu();
+game.currentMode.run();
