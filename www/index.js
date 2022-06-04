@@ -86,6 +86,25 @@ class Target extends Drawable{
 
 class Logo extends Drawable {
     draw() {
+        this.drawBackground()
+        this.drawCrosshair()
+    }
+
+    drawCrosshair() {
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "red";
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        let a = canvas.width/2;
+        let b = 100;
+        ctx.arc(a, b, 50, 0, 2 * Math.PI);
+        ctx.stroke()
+        ctx.fillRect(a - 65, b - 5, 30, 10);
+        ctx.fillRect(a + 35, b - 5, 30, 10);
+        ctx.fillRect(a - 5, b - 65, 10, 30);
+        ctx.fillRect(a - 5, b + 35, 10, 30);
+    }
+    drawBackground() {
         ctx.fillStyle = "black";
         const fontSize = BUTTON_HEIGHT - 20;
         ctx.font = "100px Arial";
@@ -94,14 +113,14 @@ class Logo extends Drawable {
         "AIM",
         canvas.width / 4,
         150
-    )
+        )
         ctx.font = "70px Arial";
 
         ctx.fillText(
         "TRAINER",
         canvas.width - 170,
         140
-    )
+        )
     }
 }
 class SurvivalMode {
@@ -184,41 +203,9 @@ const drawMenu = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     let logo = new Logo()
     logo.draw()
-    drawCrosshair(canvas.width / 2, 100);
     menuButtons.forEach((button) => button.draw());
 };
 
-const drawLogo = () => {
-    ctx.fillStyle = "black";
-    const fontSize = BUTTON_HEIGHT - 20;
-    ctx.font = "100px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(
-        "AIM",
-        canvas.width / 4,
-        150
-    )
-    ctx.font = "70px Arial";
-
-    ctx.fillText(
-        "TRAINER",
-        canvas.width - 170,
-        140
-    )
-}
-
-const drawCrosshair = (x, y) => {
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "red";
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(x, y, 50, 0, 2 * Math.PI);
-    ctx.stroke()
-    ctx.fillRect(x - 65, y - 5, 30, 10);
-    ctx.fillRect(x + 35, y - 5, 30, 10);
-    ctx.fillRect(x - 5, y - 65, 10, 30);
-    ctx.fillRect(x - 5, y + 35, 10, 30);
-}
 
 const checkButtonHighlight = (x, y) => {
     menuButtons.forEach(button => {
