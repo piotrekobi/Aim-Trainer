@@ -7,8 +7,8 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("You gained {} points.", name));
+pub fn message(text: &str) {
+    alert(text);
 }
 
 #[wasm_bindgen]

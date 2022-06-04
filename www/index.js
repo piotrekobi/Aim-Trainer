@@ -1,4 +1,4 @@
-import { greet, cursor_inside, randint } from "aim-trainer";
+import { message, cursor_inside, randint } from "aim-trainer";
 
 const canvas = document.getElementById("main-canvas");
 canvas.width = window.innerWidth / 1.7;
@@ -51,13 +51,15 @@ class MenuButton {
 
 
 class Target {
-    constructor(x, y, size) {
+    constructor(x, y, size, lifeTime = null) {
         this.size = size;
         this.x = x;
         this.y = y;
         this.sizeRatio = 1;
         this.destroyed = 0;
         this.addTime = Date.now();
+        if (lifeTime != null)
+            this.lifeTime = lifeTime * 1000;
     }
 
     draw() {
@@ -65,33 +67,80 @@ class Target {
         fillCircle(this.x, this.y, this.size * 2 / 3 * this.sizeRatio, 'white');
         fillCircle(this.x, this.y, this.size * 1 / 3 * this.sizeRatio, 'red');
     }
+
+    hit(x, y) {
+        return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size)
+    }
 }
 class SurvivalMode {
-    constructor(lives, duration, interval, maxSize) {
+    constructor(lives, interval, maxSize) {
         this.lives = lives;
-        this.duration = duration;
+        this.startTime = Date.now();
         this.interval = interval * 1000;
         this.maxSize = maxSize;
         this.lastTargetTime = Date.now() - this.interval;
         this.targets = [];
         this.updateTimer = setInterval(this.update.bind(this), 10);
+        this.handleClick = this.handleClick.bind(this);
     }
 
     update() {
         ctx.fillStyle = BACKGROUND_COLOR;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        console.log(Date.now() - this.lastTargetTime)
+        this.drawLives();
         if (Date.now() - this.lastTargetTime > this.interval) {
             this.lastTargetTime = Date.now();
-            this.targets.push(new Target(randint(0, canvas.width - this.maxSize), randint(0, canvas.height - this.maxSize), this.maxSize));
+            this.targets.push(new Target(randint(0 + this.maxSize, canvas.width - this.maxSize), randint(0 + this.maxSize, canvas.height - this.maxSize), this.maxSize, 4.0));
         }
         this.targets.forEach(target => {
-            target.sizeRatio = 1 - Math.abs((((Date.now() - target.addTime) / (this.interval / 2)) % 2) - 1);
-            console.log(target.sizeRatio)
-            target.draw()
-            console.log(target.size)
+            if (!target.destroyed) {
+                let currentLifeTime = Date.now() - target.addTime;
+                if (currentLifeTime > target.lifeTime) {
+                    target.destroyed = true;
+                    this.lives -= 1;
+                }
+                target.sizeRatio = 1 - Math.abs((((currentLifeTime) / (target.lifeTime / 2)) % 2) - 1);
+                target.draw()
+            }
         });
+        if (!this.lives > 0)
+            this.end();
+
     }
+
+    drawLives() {
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText(
+            `Lives: ${this.lives}`,
+            canvas.width / 2,
+            canvas.height / 5
+        );
+    }
+
+    handleClick(event) {
+        let rect = canvas.getBoundingClientRect();
+        let mx = event.clientX - rect.left;
+        let my = event.clientY - rect.top;
+        for (let i = 0; i < this.targets.length; i++) {
+            if (this.targets[i].hit(mx, my)) {
+                console.log("a")
+                this.targets[i].destroyed = true;
+                break;
+            }
+        }
+    }
+
+    end() {
+        clearInterval(this.updateTimer);
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.addEventListener("mousemove", handleMouseMove);
+        canvas.addEventListener("click", handleButtonClick);
+        drawMenu();
+        message(`Time survived: ${(Date.now() - this.startTime) / 1000} seconds`);
+    }
+
+
 }
 
 const testFunc = (text) => {
@@ -167,7 +216,9 @@ const runMode = () => {
 const runMode2 = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
     canvas.removeEventListener("click", handleButtonClick);
-    new SurvivalMode(3, 10, 5, 60);
+    let mode = new SurvivalMode(3, 0.5, 30);
+    canvas.addEventListener("click", mode.handleClick);
+
     // ctx.fillStyle = BACKGROUND_COLOR;
     // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -193,7 +244,7 @@ function endMode() {
         nick: ""
 
     }));
-    greet(points.toString());
+    message(`Score: ${points}`);
     points = 0;
 }
 
@@ -231,7 +282,7 @@ function endMode3() {
         nick: ""
 
     }));
-    greet(points.toString());
+    message(`Score: ${points}`);
     points = 0;
 }
 const menuButtons = [
