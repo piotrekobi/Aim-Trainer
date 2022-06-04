@@ -186,7 +186,7 @@ class Target extends Drawable {
     }
 
     hit(x, y) {
-        return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size)
+        return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size * this.sizeRatio)
     }
 }
 
