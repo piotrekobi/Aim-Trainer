@@ -18,8 +18,18 @@ let time_start = 0;
 let time_to_wait = 3 * 1000;
 let rounds = 3;
 
-class MenuButton {
+class Drawable {
+    constructor() {
+    }
+    draw() {
+        throw new Error("Abstract method has no implementation");
+    }
+}
+
+
+class MenuButton extends Drawable{
     constructor(index, text, color, highlightColor, func) {
+        super();
         this.index = index;
         this.text = text;
         this.color = color;
