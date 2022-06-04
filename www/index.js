@@ -9,6 +9,8 @@ const BUTTON_HEIGHT = 60;
 const BUTTON_SPACING = 30;
 const TOP_MARGIN = 200;
 const BACKGROUND_COLOR = "#f5ab45"
+const NO_CLICK_BACKGROUND_COLOR = "#FF0000"
+const CLICK_BACKGROUND_COLOR = "#33FF36"
 
 let ctx = canvas.getContext("2d");
 let points = 0;
@@ -72,6 +74,7 @@ class Target {
         return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size)
     }
 }
+
 class SurvivalMode {
     constructor(lives, interval, maxSize) {
         this.lives = lives;
@@ -139,8 +142,92 @@ class SurvivalMode {
         drawMenu();
         message(`Time survived: ${(Date.now() - this.startTime) / 1000} seconds`);
     }
+}
 
+class ReactionMode {
+    constructor(iterations, minWaitTime, maxWaitTime) {
+        this.iterations = iterations;
+        this.doneIterations = 0;
+        this.minWaitTime = minWaitTime * 1000;
+        this.maxWaitTime = maxWaitTime * 1000;
+        this.waitTime = randint(this.minWaitTime, this.maxWaitTime);
+        this.updateTimer = setInterval(this.update.bind(this), 10);
+        this.handleClick = this.handleClick.bind(this);
+        this.canIClick = 0;
+        this.curTime = 0;
+        this.points = 0;
+        this.clickTime = 0;
+        this.startTime = 0;
+    }
 
+    update() {
+        this.drawRed();
+        if (this.curTime > this.waitTime){
+            this.drawGreen();
+            if (this.canIClick == 0){
+                this.startTime = Date.now();
+            }
+            this.canIClick = 1;
+        }
+        this.drawPoints();
+        this.curTime += 10;
+        console.log(this.curTime);
+    }
+
+    drawPoints() {
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.fillText(
+            `Points: ${this.points}`,
+            canvas.width / 2,
+            canvas.height / 5
+        );
+        ctx.fillText(
+            `Tries left: ${this.iterations - this.doneIterations}`,
+            canvas.width / 2,
+            canvas.height / 4 + 10
+        );
+    }
+
+    drawRed() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = NO_CLICK_BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    drawGreen() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = CLICK_BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    handleClick(event) {
+        this.curTime = 0;
+        if (this.canIClick){
+            this.wait_time = randint(this.minWaitTime, this.maxWaitTime);
+            this.canIClick = 0;
+            this.doneIterations += 1;
+            let currentDate = Date.now();
+            let temp = 1000 - currentDate + this.startTime;
+            console.log(temp);
+            if (temp > 0){
+                this.points += temp;
+            }
+            this.startTime = Date.now();
+            if (this.doneIterations == this.iterations){
+                this.end()
+                message(`Your score: ${this.points}`);
+            }
+        }
+    }
+
+    end() {
+        clearInterval(this.updateTimer);
+        canvas.removeEventListener("mousedown", handleMouseDown);
+        canvas.addEventListener("mousemove", handleMouseMove);
+        canvas.addEventListener("click", handleButtonClick);
+        drawMenu();
+    }
 }
 
 const testFunc = (text) => {
@@ -221,7 +308,16 @@ const runMode2 = () => {
 
     // ctx.fillStyle = BACKGROUND_COLOR;
     // ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
 
+const runMode4 = () => {
+    canvas.removeEventListener("mousemove", handleMouseMove);
+    canvas.removeEventListener("click", handleButtonClick);
+    let rmode = new ReactionMode(6, 3, 7);
+    canvas.addEventListener("click", rmode.handleClick);
+
+    // ctx.fillStyle = BACKGROUND_COLOR;
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function endMode() {
@@ -289,7 +385,7 @@ const menuButtons = [
     new MenuButton(0, "Tryb 1", "#FF0000", "#AA0000", runMode),
     new MenuButton(1, "Tryb 2", "#0000FF", "#0000AA", runMode2),
     new MenuButton(2, "Tryb 3", "#008000", "#004000", runMode3),
-    new MenuButton(3, "Tryb 4", "#000000", "#333333", testFunc),
+    new MenuButton(3, "Tryb 4", "#000000", "#333333", runMode4),
 ];
 
 function handleMouseMove(event) {
