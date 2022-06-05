@@ -75,7 +75,7 @@ class Menu extends Mode {
     constructor() {
         super();
         this.buttons = [
-            new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", "TimeMode", []),
+            new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", TimeMode, [5]),
             new MenuButton(1, "Survival", "#0000FF", "#0000AA", SurvivalMode, [3, 0.5, 30]),
             new MenuButton(2, "Flick Training", "#008000", "#004000", FlickMode, [3, 1, 3]),
             new MenuButton(3, "Reaction Time", "#000000", "#333333", ReactionMode, [6, 3, 7]),
@@ -231,6 +231,48 @@ class Logo extends Drawable {
         )
     }
 }
+
+class TimeMode extends Mode{
+    constructor(timeToEnd) {
+        super();
+        this.startTime = Date.now();
+        this.timeToEnd = timeToEnd * 1000;
+        this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
+    }
+
+    draw() {
+        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
+        game.ctx.fillStyle = BACKGROUND_COLOR;
+        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+        this.target.draw();
+        if (Date.now() > this.startTime + this.timeToEnd){
+            this.end(`Your score: ${this.points}`);
+        }
+        this.drawPoints();
+    }
+
+    drawPoints() {
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            `Points: ${this.points}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2
+        );
+    }
+
+    handleClick(event) {
+        let rect = game.canvas.getBoundingClientRect();
+        let mx = event.clientX - rect.left;
+        let my = event.clientY - rect.top;
+        if (this.target.hit(mx, my)) {
+            this.points ++;
+            this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
+        }
+    }
+
+}
+
 class SurvivalMode extends Mode {
     constructor(lives, interval, maxSize) {
         super();
@@ -471,43 +513,6 @@ function endMode() {
     points = 0;
 }
 
-const runMode3 = () => {
-    canvas.removeEventListener("mousemove", handleMouseMove);
-    canvas.removeEventListener("click", handleButtonClick);
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    canvas.addEventListener("click", handleMouseClick3);
-    points = 0;
-    rounds = 3;
-    x = canvas.width / 2;
-    y = canvas.height / 2;
-    drawTarget(x, y)
-
-}
-
-
-function endMode3() {
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("click", handleButtonClick);
-    drawMenu();
-    var xhr = new XMLHttpRequest();
-
-
-    const a1gamer = 'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=3&result=' + points.toString();
-
-
-    xhr.open("POST", a1gamer, true);
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.send(JSON.stringify({
-
-        nick: ""
-
-    }));
-    message(`Score: ${points}`);
-    points = 0;
-}
 
 function handleMouseDown(event) {
     getMousePosition(canvas, event);
