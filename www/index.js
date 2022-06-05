@@ -344,7 +344,6 @@ class FlickMode extends Mode {
     setFlickEvent() {
         this.flickEvent = true;
     }
-}
 
     end(message_text = null) {
         game.canvas.removeEventListener("click", this.handleClick);
@@ -359,143 +358,6 @@ class FlickMode extends Mode {
 
     }
 
-    update() {
-        if (Date.now() > this.startTime + this.timeToEnd){
-            this.end();
-        }
-        this.drawPoints();
-    }
-
-    drawTarget(x, y) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        fillCircle(x, y, 60, 'red');
-        fillCircle(x, y, 40, 'white');
-        fillCircle(x, y, 20, 'red');
-    }
-
-    drawPoints() {
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.fillText(
-            `Points: ${this.points}`,
-            canvas.width / 2,
-            canvas.height + 50
-        );
-    }
-
-    handleClick(event) {
-        let rect = canvas.getBoundingClientRect();
-        let mx = event.clientX - rect.left;
-        let my = event.clientY - rect.top;
-        console.log(mx);
-        console.log(my);
-        console.log(this.x);
-        console.log(this.y);
-        if (Math.sqrt(Math.pow(this.x - mx, 2) + Math.pow(this.y - my, 2)) <= 60) {
-            this.x = randint(60, canvas.width - 60);
-            this.y = randint(60, canvas.height - 60);
-            this.drawTarget(this.x, this.y);
-            this.points += 1;
-        }
-    }
-
-    end() {
-        clearInterval(this.updateTimer);
-        canvas.removeEventListener("mousedown", handleMouseDown);
-        canvas.addEventListener("mousemove", handleMouseMove);
-        canvas.addEventListener("click", handleButtonClick);
-        drawMenu();
-        message(`Your score: ${this.points}`);
-    }
-}
-
-class ReactionMode {
-    constructor(iterations, minWaitTime, maxWaitTime) {
-        this.iterations = iterations;
-        this.doneIterations = 0;
-        this.minWaitTime = minWaitTime * 1000;
-        this.maxWaitTime = maxWaitTime * 1000;
-        this.waitTime = randint(this.minWaitTime, this.maxWaitTime);
-        this.updateTimer = setInterval(this.update.bind(this), 10);
-        this.handleClick = this.handleClick.bind(this);
-        this.canIClick = 0;
-        this.curTime = 0;
-        this.points = 0;
-        this.clickTime = 0;
-        this.startTime = 0;
-    }
-
-    update() {
-        this.drawRed();
-        if (this.curTime > this.waitTime){
-            this.drawGreen();
-            if (this.canIClick == 0){
-                this.startTime = Date.now();
-            }
-            this.canIClick = 1;
-        }
-        this.drawPoints();
-        this.curTime += 10;
-        console.log(this.curTime);
-    }
-
-    drawPoints() {
-        ctx.fillStyle = "black";
-        ctx.textAlign = "center";
-        ctx.fillText(
-            `Points: ${this.points}`,
-            canvas.width / 2,
-            canvas.height / 5
-        );
-        ctx.fillText(
-            `Tries left: ${this.iterations - this.doneIterations}`,
-            canvas.width / 2,
-            canvas.height / 4 + 10
-        );
-    }
-
-    drawRed() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = NO_CLICK_BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    drawGreen() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = CLICK_BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    handleClick(event) {
-        this.curTime = 0;
-        if (this.canIClick){
-            this.wait_time = randint(this.minWaitTime, this.maxWaitTime);
-            this.canIClick = 0;
-            this.doneIterations += 1;
-            let currentDate = Date.now();
-            let temp = 1000 - currentDate + this.startTime;
-            console.log(temp);
-            if (temp > 0){
-                this.points += temp;
-            }
-            this.startTime = Date.now();
-            if (this.doneIterations == this.iterations){
-                this.update()
-                this.end()
-            }
-        }
-    }
-
-    end() {
-        clearInterval(this.updateTimer);
-        canvas.removeEventListener("mousedown", handleMouseDown);
-        canvas.addEventListener("mousemove", handleMouseMove);
-        canvas.addEventListener("click", handleButtonClick);
-        drawMenu();
-        message(`Your score: ${this.points}`);
-    }
 }
 
 class ReactionMode extends Mode{
@@ -576,8 +438,14 @@ class ReactionMode extends Mode{
 const runMode = () => {
     canvas.removeEventListener("mousemove", handleMouseMove);
     canvas.removeEventListener("click", handleButtonClick);
-    let mode = new ClickMode(5);
-    canvas.addEventListener("click", mode.handleClick);
+    ctx.fillStyle = BACKGROUND_COLOR;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvas.addEventListener("mousedown", handleMouseDown);
+    x = randint(60, canvas.width - 60);
+    y = randint(60, canvas.height - 60);
+    drawTarget(x, y);
+    setTimeout(endMode, 5000);
+}
 
 function endMode() {
     canvas.removeEventListener("mousedown", handleMouseDown);
