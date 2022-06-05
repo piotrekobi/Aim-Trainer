@@ -1,40 +1,9 @@
-import { message, cursor_inside, randint } from "aim-trainer";
+import { message, randint } from "aim-trainer";
+import { MenuButton, Logo, Target } from "./drawables";
+import { game } from "./index"
 
-
-const BUTTON_SPACING = 30;
-const TOP_MARGIN = 200;
-const BACKGROUND_COLOR = "#f5ab45"
 const NO_CLICK_BACKGROUND_COLOR = "#FF0000"
 const CLICK_BACKGROUND_COLOR = "#33FF36"
-
-let points = 0;
-let time_start = 0;
-let rounds = 3;
-class Game {
-    constructor() {
-        this.canvas = document.getElementById("main-canvas");
-        this.canvas.width = window.innerWidth / 1.7;
-        this.canvas.height = window.innerHeight / 1.3;
-        this.buttonWidth = this.canvas.width - 100;
-        this.buttonHeight = 60;
-        this.ctx = this.canvas.getContext("2d");
-    }
-
-    getCursorCoords(event) {
-        const boundingRect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / boundingRect.width;
-        const scaleY = this.canvas.height / boundingRect.height;
-
-        const x = (event.clientX - boundingRect.left) * scaleX;
-        const y = (event.clientY - boundingRect.top) * scaleY;
-        return [x, y];
-    }
-
-    drawBackground(color = BACKGROUND_COLOR) {
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-}
 
 class Mode {
     constructor() {
@@ -119,120 +88,9 @@ class Menu extends Mode {
         this.buttons.forEach((button) => button.draw());
     }
 }
-class Drawable {
-    constructor() {
-    }
-    draw() {
-        throw new Error("Abstract method has no implementation");
-    }
-}
-
-class MenuButton extends Drawable {
-    constructor(index, text, color, highlightColor, mode, modeArgs) {
-        super();
-        this.index = index;
-        this.text = text;
-        this.color = color;
-        this.hightlightColor = highlightColor;
-        this.mode = mode;
-        this.modeArgs = modeArgs;
-        this.x = game.canvas.width / 2 - game.buttonWidth / 2;
-        this.y = (game.buttonHeight + BUTTON_SPACING) * this.index + TOP_MARGIN;
-        this.highlighted = false;
-    }
-
-    draw() {
-        game.ctx.fillStyle = this.highlighted ? this.hightlightColor : this.color;
-        game.ctx.fillRect(this.x, this.y, game.buttonWidth, game.buttonHeight);
-        game.ctx.fillStyle = "white";
-        const fontSize = game.buttonHeight - 20;
-        game.ctx.font = `${fontSize}px Arial`;
-        game.ctx.textAlign = "center";
-        game.ctx.fillText(
-            this.text,
-            game.canvas.width / 2,
-            this.y + (game.buttonHeight / 2 + fontSize / 2 - fontSize / 7)
-        );
-    }
-
-    cursorInside(x, y) {
-        return cursor_inside(x, y, this.x, this.y, game.buttonWidth, game.buttonHeight);
-    }
-}
 
 
-class Target extends Drawable {
-    constructor(x, y, size, lifeTime = null) {
-        super();
-        this.size = size;
-        this.x = x;
-        this.y = y;
-        this.sizeRatio = 1;
-        this.destroyed = 0;
-        this.addTime = Date.now();
-        if (lifeTime != null)
-            this.lifeTime = lifeTime * 1000;
-    }
-
-    draw() {
-        this.fillCircle(this.x, this.y, this.size * this.sizeRatio, 'red');
-        this.fillCircle(this.x, this.y, this.size * 2 / 3 * this.sizeRatio, 'white');
-        this.fillCircle(this.x, this.y, this.size * 1 / 3 * this.sizeRatio, 'red');
-    }
-
-    fillCircle(x, y, radius, color) {
-        game.ctx.fillStyle = color;
-        game.ctx.beginPath();
-        game.ctx.arc(x, y, radius, 0, 2 * Math.PI);
-        game.ctx.fill();
-    }
-
-    hit(x, y) {
-        return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size * this.sizeRatio)
-    }
-}
-
-class Logo extends Drawable {
-    draw() {
-        this.drawBackground()
-        this.drawCrosshair()
-    }
-
-    drawCrosshair() {
-        game.ctx.lineWidth = 5;
-        game.ctx.strokeStyle = "red";
-        game.ctx.fillStyle = "red";
-        game.ctx.beginPath();
-        let a = game.canvas.width / 2;
-        let b = 100;
-        game.ctx.arc(a, b, 50, 0, 2 * Math.PI);
-        game.ctx.stroke()
-        game.ctx.fillRect(a - 65, b - 5, 30, 10);
-        game.ctx.fillRect(a + 35, b - 5, 30, 10);
-        game.ctx.fillRect(a - 5, b - 65, 10, 30);
-        game.ctx.fillRect(a - 5, b + 35, 10, 30);
-    }
-    drawBackground() {
-        game.ctx.fillStyle = "black";
-        const fontSize = game.buttonHeight - 20;
-        game.ctx.font = "100px Arial";
-        game.ctx.textAlign = "center";
-        game.ctx.fillText(
-            "AIM",
-            game.canvas.width / 4,
-            150
-        )
-        game.ctx.font = "70px Arial";
-
-        game.ctx.fillText(
-            "TRAINER",
-            game.canvas.width - 170,
-            140
-        )
-    }
-}
-
-class TimeMode extends Mode{
+class TimeMode extends Mode {
     constructor(timeToEnd) {
         super();
         this.startTime = Date.now();
@@ -242,10 +100,9 @@ class TimeMode extends Mode{
 
     draw() {
         game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        game.ctx.fillStyle = BACKGROUND_COLOR;
-        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+        game.drawBackground();
         this.target.draw();
-        if (Date.now() > this.startTime + this.timeToEnd){
+        if (Date.now() > this.startTime + this.timeToEnd) {
             this.end(`Your score: ${this.points}`);
         }
         this.drawPoints();
@@ -266,7 +123,7 @@ class TimeMode extends Mode{
         let mx = event.clientX - rect.left;
         let my = event.clientY - rect.top;
         if (this.target.hit(mx, my)) {
-            this.points ++;
+            this.points++;
             this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
         }
     }
@@ -285,8 +142,7 @@ class SurvivalMode extends Mode {
     }
 
     draw() {
-        game.ctx.fillStyle = BACKGROUND_COLOR;
-        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+        game.drawBackground();
         this.drawLives();
         if (Date.now() - this.lastTargetTime > this.interval) {
             this.lastTargetTime = Date.now();
@@ -338,13 +194,12 @@ class FlickMode extends Mode {
         this.timeMin = timeMin;
         this.timeMax = timeMax;
         this.flickEvent = false;
-        this.waitingTarget = new Target(game.canvas.width/2, game.canvas.height/2, 60, 99999);
-        this.mainTarget = new Target(game.canvas.width/2, game.canvas.height/2, 60, 99999);
+        this.waitingTarget = new Target(game.canvas.width / 2, game.canvas.height / 2, 60, 99999);
+        this.mainTarget = new Target(game.canvas.width / 2, game.canvas.height / 2, 60, 99999);
     }
 
     draw() {
-        game.ctx.fillStyle = BACKGROUND_COLOR;
-        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+        game.drawBackground();
         if (this.flickEvent == false) {
             this.waitingTarget.draw();
         }
@@ -366,19 +221,18 @@ class FlickMode extends Mode {
         if (this.flickEvent == true) {
             if (this.mainTarget.hit(mx, my)) {
                 this.flickEvent = false
-                this.rounds --;
+                this.rounds--;
                 if (this.rounds == 0) {
                     this.end();
                 }
             }
         }
-        //flickEvent == false
         else {
             if (this.waitingTarget.hit(mx, my)) {
                 let timeToWait = randint(3000, 5000)
                 setTimeout(this.setFlickEvent(), timeToWait);
                 this.mainTarget = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60);
-                
+
             }
         }
     }
@@ -402,7 +256,7 @@ class FlickMode extends Mode {
 
 }
 
-class ReactionMode extends Mode{
+class ReactionMode extends Mode {
     constructor(iterations, minWaitTime, maxWaitTime) {
         super();
         this.iterations = iterations;
@@ -417,17 +271,16 @@ class ReactionMode extends Mode{
     }
 
     draw() {
-        this.drawRed();
-        if (this.curTime > this.waitTime){
-            this.drawGreen();
-            if (this.canIClick == 0){
+        game.drawBackground(NO_CLICK_BACKGROUND_COLOR);
+        if (this.curTime > this.waitTime) {
+            game.drawBackground(CLICK_BACKGROUND_COLOR);
+            if (this.canIClick == 0) {
                 this.startTime = Date.now();
             }
             this.canIClick = 1;
         }
         this.drawPoints();
         this.curTime += 10;
-        console.log(this.curTime);
     }
 
     drawPoints() {
@@ -445,100 +298,23 @@ class ReactionMode extends Mode{
         );
     }
 
-    drawRed() {
-        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        game.ctx.fillStyle = NO_CLICK_BACKGROUND_COLOR;
-        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-    }
-
-    drawGreen() {
-        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-        game.ctx.fillStyle = CLICK_BACKGROUND_COLOR;
-        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-    }
-
     handleClick(event) {
         this.curTime = 0;
-        if (this.canIClick){
+        if (this.canIClick) {
             this.wait_time = randint(this.minWaitTime, this.maxWaitTime);
             this.canIClick = 0;
             this.doneIterations += 1;
             let currentDate = Date.now();
             let temp = 1000 - currentDate + this.startTime;
-            console.log(temp);
-            if (temp > 0){
+            if (temp > 0) {
                 this.points += temp;
             }
             this.startTime = Date.now();
-            if (this.doneIterations == this.iterations){
+            if (this.doneIterations == this.iterations) {
                 this.end(`Your score: ${this.points}`)
             }
         }
     }
 }
 
-function handleMouseDown(event) {
-    getMousePosition(canvas, event);
-}
-
-function handleMouseClick3(event) {
-    let rect = canvas.getBoundingClientRect();
-    let mx = event.clientX - rect.left;
-    let my = event.clientY - rect.top;
-    if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
-        canvas.removeEventListener("click", handleMouseClick3);
-        let time_to_wait = randint(3000, 7000)
-        setTimeout(handleFlickStart, time_to_wait);
-    }
-}
-
-function handleFlickStart() {
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    time_start = Date.now();
-    canvas.addEventListener("click", handleClick3Flick);
-    x = randint(60, canvas.width - 60);
-    y = randint(60, canvas.height - 60);
-    drawTarget(x, y);
-}
-
-function handleClick3Flick(event) {
-    let rect = canvas.getBoundingClientRect();
-    let mx = event.clientX - rect.left;
-    let my = event.clientY - rect.top;
-    if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
-        points = points + Date.now() - time_start;
-        rounds--;
-        canvas.removeEventListener("click", handleClick3Flick);
-        if (rounds < 1) {
-            endMode3();
-        }
-        else {
-            ctx.fillStyle = BACKGROUND_COLOR;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            x = canvas.width / 2;
-            y = canvas.height / 2;
-            drawTarget(x, y);
-            canvas.addEventListener("click", handleMouseClick3);
-
-        }
-    }
-}
-
-function getMousePosition(canvas, event) {
-    let rect = canvas.getBoundingClientRect();
-    let mx = event.clientX - rect.left;
-    let my = event.clientY - rect.top;
-    if (Math.sqrt(Math.pow(x - mx, 2) + Math.pow(y - my, 2)) <= 60) {
-        ctx.fillStyle = BACKGROUND_COLOR;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        x = randint(60, canvas.width - 60);
-        y = randint(60, canvas.height - 60);
-        drawTarget(x, y);
-        points++
-    }
-}
-
-var game = new Game();
-game.currentMode = new Menu();
-game.currentMode.run();
+export { Menu };
