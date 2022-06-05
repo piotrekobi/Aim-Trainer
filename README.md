@@ -58,6 +58,12 @@ Testy jednostkowe javascript uruchamiane są wewnątrz folderu www/ za pomocą 
 npm test
 ```
 
+Testy jednostkowe funkcji napisanych w języku Rust można uruchomić za pomocą komendy:
+
+```bash
+wasm-pack test --node
+```
+
 Testy jednostkowe serwera w Pythonie:
 
 Należy najpierw zainstalować wykorzystywane moduły:
