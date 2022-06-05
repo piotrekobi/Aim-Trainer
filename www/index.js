@@ -75,7 +75,7 @@ class Menu extends Mode {
         this.buttons = [
             new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", "TimeMode", []),
             new MenuButton(1, "Survival", "#0000FF", "#0000AA", SurvivalMode, [3, 0.5, 30]),
-            new MenuButton(2, "Flick Training", "#008000", "#004000", "FlickMode", []),
+            new MenuButton(2, "Flick Training", "#008000", "#004000", FlickMode, [3, 1, 3]),
             new MenuButton(3, "Reaction Time", "#000000", "#333333", "ReactionMode", []),
         ];
         this.logo = new Logo();
@@ -285,6 +285,77 @@ class SurvivalMode extends Mode {
         });
         this.targets = this.targets.filter(target => target.destroyed == false);
     }
+}
+
+class FlickMode extends Mode {
+    constructor(rounds, timeMin, timeMax) {
+        super();
+        this.rounds = rounds;
+        this.timeMin = timeMin;
+        this.timeMax = timeMax;
+        this.flickEvent = false;
+        this.waitingTarget = new Target(game.canvas.width/2, game.canvas.height/2, 60, 99999);
+        this.mainTarget = new Target(game.canvas.width/2, game.canvas.height/2, 60, 99999);
+    }
+
+    draw() {
+        game.ctx.fillStyle = BACKGROUND_COLOR;
+        game.ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
+        if (this.flickEvent == false) {
+            this.waitingTarget.draw();
+        }
+        else {
+            this.mainTarget.draw();
+        }
+    }
+
+    run() {
+        game.canvas.addEventListener("click", this.handleClick);
+        this.drawTimer = setInterval(this.draw.bind(this), 10);
+    }
+
+    handleClick(event) {
+        let rect = game.canvas.getBoundingClientRect();
+        let mx = event.clientX - rect.left;
+        let my = event.clientY - rect.top;
+
+        if (this.flickEvent == true) {
+            if (this.mainTarget.hit(mx, my)) {
+                this.flickEvent = false
+                this.rounds --;
+                if (this.rounds == 0) {
+                    this.end();
+                }
+            }
+        }
+        //flickEvent == false
+        else {
+            if (this.waitingTarget.hit(mx, my)) {
+                let timeToWait = randint(3000, 5000)
+                setTimeout(this.setFlickEvent(), timeToWait);
+                this.mainTarget = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60);
+                
+            }
+        }
+    }
+
+    setFlickEvent() {
+        this.flickEvent = true;
+    }
+
+    end(message_text = null) {
+        game.canvas.removeEventListener("click", this.handleClick);
+        clearInterval(this.drawTimer);
+        if (message_text)
+            message(message_text);
+
+        if (!(game.currentMode instanceof Menu)) {
+            game.currentMode = new Menu();
+            game.currentMode.run();
+        }
+
+    }
+
 }
 
 
