@@ -1,9 +1,11 @@
 import { message, randint } from "aim-trainer";
 import { MenuButton, Logo, Target } from "./drawables";
 import { game } from "./index"
+import { ApiController } from "./apiController";
 
 const NO_CLICK_BACKGROUND_COLOR = "#FF0000"
 const CLICK_BACKGROUND_COLOR = "#33FF36"
+const API_URL = 'http://localhost:8000'
 
 class Mode {
     constructor() {
@@ -39,6 +41,21 @@ class Mode {
     }
 
 }
+
+class ModeApi extends Mode {
+    constructor(mode) {
+        super();
+        this.api = new ApiController(API_URL)
+        this.mode = mode
+    }
+
+    end(message_text = null) {
+        this.api.postResult(game.nick, this.mode, this.points)
+        super.end(message_text)
+        }
+}
+
+
 
 class Menu extends Mode {
     constructor() {
@@ -90,9 +107,9 @@ class Menu extends Mode {
 }
 
 
-class TimeMode extends Mode {
+class TimeMode extends ModeApi {
     constructor(timeToEnd) {
-        super();
+        super(0);
         this.startTime = Date.now();
         this.timeToEnd = timeToEnd * 1000;
         this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
@@ -132,9 +149,9 @@ class TimeMode extends Mode {
 
 }
 
-class SurvivalMode extends Mode {
+class SurvivalMode extends ModeApi {
     constructor(lives, interval, maxSize) {
-        super();
+        super(1);
         this.lives = lives;
         this.startTime = Date.now();
         this.interval = interval * 1000;
@@ -187,9 +204,9 @@ class SurvivalMode extends Mode {
     }
 }
 
-class FlickMode extends Mode {
+class FlickMode extends ModeApi {
     constructor(rounds, timeMin, timeMax) {
-        super();
+        super(2);
         this.rounds = rounds;
         this.timeMin = timeMin;
         this.timeMax = timeMax;
@@ -221,7 +238,7 @@ class FlickMode extends Mode {
                 this.flickEvent = false
                 this.rounds--;
                 if (this.rounds == 0) {
-                    this.end();
+                    this.end(`Points: ${this.points}`);
                 }
             }
         }
@@ -238,25 +255,11 @@ class FlickMode extends Mode {
     setFlickEvent() {
         this.flickEvent = true;
     }
-
-    end(message_text = null) {
-        game.canvas.removeEventListener("click", this.handleClick);
-        clearInterval(this.drawTimer);
-        if (message_text)
-            message(message_text);
-
-        if (!(game.currentMode instanceof Menu)) {
-            game.currentMode = new Menu();
-            game.currentMode.run();
-        }
-
-    }
-
 }
 
-class ReactionMode extends Mode {
+class ReactionMode extends ModeApi {
     constructor(iterations, minWaitTime, maxWaitTime) {
-        super();
+        super(3);
         this.iterations = iterations;
         this.doneIterations = 0;
         this.minWaitTime = minWaitTime * 1000;
