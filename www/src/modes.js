@@ -44,7 +44,7 @@ class Menu extends Mode {
     constructor() {
         super();
         this.buttons = [
-            new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", TimeMode, [5]),
+            new MenuButton(0, "Time Trial", "#FF0000", "#AA0000", TimeMode, [20]),
             new MenuButton(1, "Survival", "#0000FF", "#0000AA", SurvivalMode, [3, 0.5, 30]),
             new MenuButton(2, "Flick Training", "#008000", "#004000", FlickMode, [3, 1, 3]),
             new MenuButton(3, "Reaction Time", "#000000", "#333333", ReactionMode, [6, 3, 7]),
@@ -99,7 +99,6 @@ class TimeMode extends Mode {
     }
 
     draw() {
-        game.ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
         game.drawBackground();
         this.target.draw();
         if (Date.now() > this.startTime + this.timeToEnd) {
@@ -119,10 +118,8 @@ class TimeMode extends Mode {
     }
 
     handleClick(event) {
-        let rect = game.canvas.getBoundingClientRect();
-        let mx = event.clientX - rect.left;
-        let my = event.clientY - rect.top;
-        if (this.target.hit(mx, my)) {
+        const [x, y] = game.getCursorCoords(event);
+        if (this.target.hit(x, y)) {
             this.points++;
             this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
         }
@@ -175,11 +172,9 @@ class SurvivalMode extends Mode {
     }
 
     handleClick(event) {
-        let rect = game.canvas.getBoundingClientRect();
-        let mx = event.clientX - rect.left;
-        let my = event.clientY - rect.top;
+        const [x, y] = game.getCursorCoords(event);
         this.targets.forEach(target => {
-            if (target.hit(mx, my)) {
+            if (target.hit(x, y)) {
                 target.destroyed = true;
             }
         });
@@ -214,12 +209,10 @@ class FlickMode extends Mode {
     }
 
     handleClick(event) {
-        let rect = game.canvas.getBoundingClientRect();
-        let mx = event.clientX - rect.left;
-        let my = event.clientY - rect.top;
+        const [x, y] = game.getCursorCoords(event);
 
         if (this.flickEvent == true) {
-            if (this.mainTarget.hit(mx, my)) {
+            if (this.mainTarget.hit(x, y)) {
                 this.flickEvent = false
                 this.rounds--;
                 if (this.rounds == 0) {
@@ -228,7 +221,7 @@ class FlickMode extends Mode {
             }
         }
         else {
-            if (this.waitingTarget.hit(mx, my)) {
+            if (this.waitingTarget.hit(x, y)) {
                 let timeToWait = randint(3000, 5000)
                 setTimeout(this.setFlickEvent(), timeToWait);
                 this.mainTarget = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60);
