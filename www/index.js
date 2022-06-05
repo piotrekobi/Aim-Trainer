@@ -477,43 +477,6 @@ class ReactionMode extends Mode{
     }
 }
 
-const runMode = () => {
-    canvas.removeEventListener("mousemove", handleMouseMove);
-    canvas.removeEventListener("click", handleButtonClick);
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    canvas.addEventListener("mousedown", handleMouseDown);
-    x = randint(60, canvas.width - 60);
-    y = randint(60, canvas.height - 60);
-    drawTarget(x, y);
-    setTimeout(endMode, 5000);
-}
-
-function endMode() {
-    canvas.removeEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("click", handleButtonClick);
-    drawMenu();
-    var xhr = new XMLHttpRequest();
-
-
-    const a1gamer = 'http://localhost:8000/user_data/?nick=a1&timestamp=' + Math.floor(Date.now() / 1000) + '&mode=1&result=' + points.toString();
-
-
-    xhr.open("POST", a1gamer, true);
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.send(JSON.stringify({
-
-        nick: ""
-
-    }));
-    message(`Score: ${points}`);
-    points = 0;
-}
-
-
 function handleMouseDown(event) {
     getMousePosition(canvas, event);
 }
