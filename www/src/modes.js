@@ -220,7 +220,6 @@ class FlickMode extends ModeApi {
         game.drawBackground();
         this.target.draw();
         this.drawPoints();
-        console.log(this.curTime);
         if (this.curTime > this.waitTime && this.flickEvent == false) {
             this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
             this.flickEvent = true;
