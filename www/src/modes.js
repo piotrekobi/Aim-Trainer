@@ -113,7 +113,12 @@ class TimeMode extends Mode {
         game.ctx.fillText(
             `Points: ${this.points}`,
             game.canvas.width / 2,
-            game.canvas.height / 2
+            game.canvas.height / 2 + 20
+        );
+        game.ctx.fillText(
+            `Time left: ${Math.floor((this.startTime + this.timeToEnd - Date.now()) / 1000)}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 - 20
         );
     }
 
@@ -261,6 +266,7 @@ class ReactionMode extends Mode {
         this.curTime = 0;
         this.clickTime = 0;
         this.startTime = 0;
+        this.lastReaction = 0
     }
 
     draw() {
@@ -282,12 +288,17 @@ class ReactionMode extends Mode {
         game.ctx.fillText(
             `Points: ${this.points}`,
             game.canvas.width / 2,
-            game.canvas.height / 5
+            game.canvas.height / 2
         );
         game.ctx.fillText(
             `Tries left: ${this.iterations - this.doneIterations}`,
             game.canvas.width / 2,
-            game.canvas.height / 4 + 10
+            game.canvas.height / 2 - 35
+        );
+        game.ctx.fillText(
+            `Last reaction time: ${this.lastReaction}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 + 35
         );
     }
 
@@ -298,6 +309,7 @@ class ReactionMode extends Mode {
             this.canIClick = 0;
             this.doneIterations += 1;
             let currentDate = Date.now();
+            this.lastReaction = currentDate - this.startTime
             let temp = 1000 - currentDate + this.startTime;
             if (temp > 0) {
                 this.points += temp;
