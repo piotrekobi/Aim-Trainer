@@ -204,9 +204,9 @@ class SurvivalMode extends ModeApi {
     }
 }
 
-class FlickMode extends Mode {
+class FlickMode extends ModeApi {
     constructor(rounds, timeMin, timeMax) {
-        super();
+        super(2);
         this.rounds = rounds;
         this.timeMin = timeMin * 1000;
         this.timeMax = timeMax * 1000;
