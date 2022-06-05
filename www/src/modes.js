@@ -204,56 +204,70 @@ class SurvivalMode extends ModeApi {
     }
 }
 
-class FlickMode extends ModeApi {
+class FlickMode extends Mode {
     constructor(rounds, timeMin, timeMax) {
-        super(2);
+        super();
         this.rounds = rounds;
-        this.timeMin = timeMin;
-        this.timeMax = timeMax;
+        this.timeMin = timeMin * 1000;
+        this.timeMax = timeMax * 1000;
         this.flickEvent = false;
-        this.waitingTarget = new Target(game.canvas.width / 2, game.canvas.height / 2, 60, 99999);
-        this.mainTarget = new Target(game.canvas.width / 2, game.canvas.height / 2, 60, 99999);
+        this.waitTime = randint(this.timeMin, this.timeMax);
+        this.curTime = 0;
+        this.target = new Target(-1000, -1000, 60, 99999);
     }
 
     draw() {
         game.drawBackground();
-        if (this.flickEvent == false) {
-            this.waitingTarget.draw();
+        this.target.draw();
+        this.drawPoints();
+        console.log(this.curTime);
+        if (this.curTime > this.waitTime && this.flickEvent == false) {
+            this.target = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60, 99999);
+            this.flickEvent = true;
+            this.startTime = Date.now();
         }
-        else {
-            this.mainTarget.draw();
-        }
+        this.curTime += 10;
     }
 
-    run() {
-        game.canvas.addEventListener("click", this.handleClick);
-        this.drawTimer = setInterval(this.draw.bind(this), 10);
+    drawPoints() {
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            `Points: ${this.points}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 - 145
+        );
+        game.ctx.fillText(
+            `Tries left: ${this.rounds}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 - 180
+        );
+        game.ctx.fillText(
+            `Last reaction time: ${this.lastReaction}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 - 110
+        );
     }
 
     handleClick(event) {
-        const [x, y] = game.getCursorCoords(event);
-
-        if (this.flickEvent == true) {
-            if (this.mainTarget.hit(x, y)) {
-                this.flickEvent = false
-                this.rounds--;
-                if (this.rounds == 0) {
-                    this.end(`Points: ${this.points}`);
+        this.curTime = 0;
+        if (this.flickEvent) {
+            const [x, y] = game.getCursorCoords(event);
+            if (this.target.hit(x, y)) {
+                let currentDate = Date.now();
+                this.lastReaction = currentDate - this.startTime
+                let temp = 1000 - currentDate + this.startTime;
+                if (temp > 0) {
+                    this.points += temp;
                 }
+                this.target = new Target(-1000, -1000, 60, 99999);
+                this.rounds --;
+                if (this.rounds == 0){
+                    this.end(`Your score: ${this.points}`)
+                }
+                this.flickEvent = false;
             }
         }
-        else {
-            if (this.waitingTarget.hit(x, y)) {
-                let timeToWait = randint(3000, 5000)
-                setTimeout(this.setFlickEvent(), timeToWait);
-                this.mainTarget = new Target(randint(60, game.canvas.width - 60), randint(60, game.canvas.height - 60), 60);
-
-            }
-        }
-    }
-
-    setFlickEvent() {
-        this.flickEvent = true;
     }
 }
 
