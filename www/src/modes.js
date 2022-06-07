@@ -52,7 +52,7 @@ class ModeApi extends Mode {
     end(message_text = null) {
         this.api.postResult(game.nick, this.mode, this.points);
         super.end(message_text);
-        }
+    }
 }
 
 class Login extends Mode {
@@ -62,23 +62,25 @@ class Login extends Mode {
         this.nick = "";
         console.log('login');
         this.logo = new Logo();
+        this.startTime = Date.now();
     }
 
     run() {
-        game.canvas.addEventListener("keydown", (e) => {
-            console.log(e.key)
+        window.addEventListener("keydown", (e) => {
             if (e.key == 'Enter') {
                 this.end()
             }
-            else {
-                this.nick += e.key
+            else if (e.key == "Backspace") {
+                this.nick = this.nick.slice(0, -1);
+            }
+            else if (e.key.length == 1) {
+                if (this.nick.length < 11)
+                    this.nick += e.key
             }
         });
         super.run();
-        console.log(10)
-   
-
     }
+
     draw() {
         game.drawBackground();
         this.drawLogin();
@@ -89,10 +91,33 @@ class Login extends Mode {
         game.ctx.fillStyle = "black";
         game.ctx.textAlign = "center";
         game.ctx.fillText(
-            `Nick: ${this.nick}`,
+            "Nick:",
             game.canvas.width / 2,
-            game.canvas.height / 2 + 20
+            game.canvas.height / 2
         );
+
+        game.ctx.font = "40px monospace"
+
+        for (let i = -5; i <= 5; i++) {
+            if (i + 5 == this.nick.length) {
+                if (Math.floor((Date.now() - this.startTime) / 500) % 2 == 0) {
+                    continue;
+                }
+            }
+
+            if (i + 5 < this.nick.length) {
+                game.ctx.fillText(
+                    this.nick[i + 5],
+                    game.canvas.width / 2 + game.canvas.width / 25 * i,
+                    game.canvas.height / 3 * 2
+                )
+            }
+            game.ctx.fillText(
+                "_",
+                game.canvas.width / 2 + game.canvas.width / 25 * i,
+                game.canvas.height / 3 * 2
+            );
+        }
     }
 
     end() {
@@ -100,7 +125,7 @@ class Login extends Mode {
         super.end();
     }
 
-    
+
 }
 
 
@@ -308,8 +333,8 @@ class FlickMode extends ModeApi {
                     this.points += temp;
                 }
                 this.target = new Target(-1000, -1000, 60, 99999);
-                this.rounds --;
-                if (this.rounds == 0){
+                this.rounds--;
+                if (this.rounds == 0) {
                     this.end(`Your score: ${this.points}`)
                 }
                 this.flickEvent = false;
