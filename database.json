@@ -32,6 +32,26 @@
                     "timestamp": 1231235,
                     "mode": 3,
                     "result": 125
+                },
+                {
+                    "timestamp": 1654629603,
+                    "mode": 1,
+                    "result": 7
+                },
+                {
+                    "timestamp": 1654629655,
+                    "mode": 1,
+                    "result": 6
+                },
+                {
+                    "timestamp": 1654629760,
+                    "mode": 1,
+                    "result": 5
+                },
+                {
+                    "timestamp": 1654629797,
+                    "mode": 1,
+                    "result": 6
                 }
             ]
         },
@@ -262,6 +282,16 @@
                     "timestamp": 1654627944,
                     "mode": 1,
                     "result": 7
+                }
+            ]
+        },
+        {
+            "nick": "aaa",
+            "games": [
+                {
+                    "timestamp": 1654629564,
+                    "mode": 1,
+                    "result": 6
                 }
             ]
         }
