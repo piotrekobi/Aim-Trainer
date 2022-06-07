@@ -251,9 +251,11 @@ class SurvivalMode extends ModeApi {
                 target.draw()
             }
         });
-        if (!this.lives > 0)
-            this.end(`Time survived: ${(Date.now() - this.startTime) / 1000} seconds`);
-
+        if (!this.lives > 0) {
+            this.points = Math.round((Date.now() - this.startTime) / 1000)
+            this.end(`Time survived: ${this.points} seconds`);
+        }
+        
     }
 
     drawLives() {

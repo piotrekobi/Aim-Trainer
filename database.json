@@ -254,6 +254,16 @@
                     "result": 0
                 }
             ]
+        },
+        {
+            "nick": "elos",
+            "games": [
+                {
+                    "timestamp": 1654627944,
+                    "mode": 1,
+                    "result": 7
+                }
+            ]
         }
     ]
 }
