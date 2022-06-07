@@ -138,6 +138,8 @@ class Menu extends Mode {
             new MenuButton(1, "Survival", "#0000FF", "#0000AA", SurvivalMode, [3, 0.5, 30]),
             new MenuButton(2, "Flick Training", "#008000", "#004000", FlickMode, [3, 1, 3]),
             new MenuButton(3, "Reaction Time", "#000000", "#333333", ReactionMode, [6, 3, 7]),
+            new MenuButton(4, "High Scores", "#D5C000", "#DAA520", RankingMode, []),
+
         ];
         this.logo = new Logo();
 
@@ -177,6 +179,48 @@ class Menu extends Mode {
     drawButtons() {
         this.buttons.forEach((button) => button.draw());
     }
+}
+
+class RankingMode extends ModeApi {
+    constructor() {
+        super();
+        this.games = JSON.parse(this.api.getUserDataResponse(game.nick))[game.nick]["games"]
+    }
+
+    draw() {
+        game.drawBackground();
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            "High scores:",
+            game.canvas.width / 2,
+            100
+        );
+
+        game.ctx.fillText(
+            "Mode",
+            game.canvas.width * 1 / 3,
+            game.canvas.height / 2
+        );
+
+        game.ctx.fillText(
+            "Best Personal Score",
+            game.canvas.width * 2 / 3,
+            game.canvas.height / 2
+        );
+        for (const [i, modeName] in ["Time", "Survival", "Flick", "Reaction"].entries()) {
+
+        }
+
+    }
+
+
+
+    handleClick(event) {
+        const [x, y] = game.getCursorCoords(event);
+
+    }
+
 }
 
 
@@ -255,7 +299,7 @@ class SurvivalMode extends ModeApi {
             this.points = Math.round((Date.now() - this.startTime) / 1000)
             this.end(`Time survived: ${this.points} seconds`);
         }
-        
+
     }
 
     drawLives() {

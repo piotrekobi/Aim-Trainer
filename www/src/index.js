@@ -7,8 +7,8 @@ class Game {
         this.canvas = document.getElementById("main-canvas");
         this.canvas.width = window.innerWidth / 1.7;
         this.canvas.height = window.innerHeight / 1.3;
-        this.buttonWidth = this.canvas.width - 100;
-        this.buttonHeight = 60;
+        this.buttonWidth = this.canvas.width - 150;
+        this.buttonHeight = 50;
         this.ctx = this.canvas.getContext("2d");
         this.nick = null
         this.currentMode = currentMode

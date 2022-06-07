@@ -1,7 +1,7 @@
 import { cursor_inside, is_hit } from "aim-trainer";
 import { game } from "./index"
 
-const BUTTON_SPACING = 30;
+const BUTTON_SPACING = 20;
 const TOP_MARGIN = 200;
 
 class MenuButton {
