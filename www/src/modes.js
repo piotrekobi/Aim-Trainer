@@ -185,40 +185,68 @@ class RankingMode extends ModeApi {
     constructor() {
         super();
         this.games = JSON.parse(this.api.getUserDataResponse(game.nick))[game.nick]["games"];
-        this.target = new Target(60,game.canvas.height - 60, 60, 99999);
+        this.returnButton = new MenuButton(4, "Return", "#FF0000", "#AA0000", Menu, []);
+        this.modeNames = ["Time:", "Survival:", "Flick:", "Reaction:"];
+        this.setBestScores();
     }
 
     draw() {
         game.drawBackground();
         game.ctx.fillStyle = "black";
         game.ctx.textAlign = "center";
+        game.ctx.textAlign = "right";
+
+
         game.ctx.fillText(
-            "High scores:",
-            game.canvas.width / 2,
-            100
+            "Mode:",
+            game.canvas.width * 2 / 5,
+            game.canvas.height / 4
         );
 
         game.ctx.fillText(
-            "Mode",
-            game.canvas.width * 1 / 3,
-            game.canvas.height / 2
-        );
-
-        game.ctx.fillText(
-            "Best Personal Score",
+            "Best Score:",
             game.canvas.width * 2 / 3,
-            game.canvas.height / 2
+            game.canvas.height / 4
         );
-        for (const [i, modeName] in ["Time", "Survival", "Flick", "Reaction"].entries()) {
-            console.log(this.games)
+
+        game.ctx.textAlign = "right";
+
+        for (let i = 0; i < 4; i++) {
+            game.ctx.fillText(
+                this.modeNames[i],
+                game.canvas.width * 2 / 5,
+                game.canvas.height / 4 + (i + 2) / 4 * game.canvas.height / 4
+            );
+            game.ctx.fillText(
+                this.bestScores[i],
+                game.canvas.width * 2 / 3,
+                game.canvas.height / 4 + (i + 2) / 4 * game.canvas.height / 4);
         }
-        this.target.draw();
+        this.returnButton.draw();
+    }
+
+    setBestScores() {
+        this.bestScores = [0, 0, 0, 0];
+        if (this.games != undefined) {
+            for (let i = 0; i < 4; i++) {
+                this.games.forEach(game => {
+                    if (this.bestScores[game["mode"]] < game["result"])
+                        this.bestScores[game["mode"]] = game["result"];
+                });
+            }
+        }
+
+    }
+
+    handleMouseMove(event) {
+        const [x, y] = game.getCursorCoords(event);
+        this.returnButton.highlighted = this.returnButton.cursorInside(x, y);
     }
 
     handleClick(event) {
         const [x, y] = game.getCursorCoords(event);
-        if (this.target.hit(x, y)){
-            this.end(`You left ranking`);
+        if (this.returnButton.cursorInside(x, y)) {
+            this.end();
         }
     }
 
