@@ -1,4 +1,4 @@
-import { Menu } from "./modes";
+import { Login } from "./modes";
 
 const BACKGROUND_COLOR = "#f5ab45"
 
@@ -32,6 +32,6 @@ class Game {
 
 
 var game = new Game();
-game.currentMode = new Menu();
+game.currentMode = new Login();
 game.currentMode.run();
 export { game };

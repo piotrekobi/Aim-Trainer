@@ -45,14 +45,62 @@ class Mode {
 class ModeApi extends Mode {
     constructor(mode) {
         super();
-        this.api = new ApiController(API_URL)
-        this.mode = mode
+        this.api = new ApiController(API_URL);
+        this.mode = mode;
     }
 
     end(message_text = null) {
-        this.api.postResult(game.nick, this.mode, this.points)
-        super.end(message_text)
+        this.api.postResult(game.nick, this.mode, this.points);
+        super.end(message_text);
         }
+}
+
+class Login extends Mode {
+
+    constructor() {
+        super();
+        this.nick = "";
+        console.log('login');
+        this.logo = new Logo();
+    }
+
+    run() {
+        game.canvas.addEventListener("keydown", (e) => {
+            console.log(e.key)
+            if (e.key == 'Enter') {
+                this.end()
+            }
+            else {
+                this.nick += e.key
+            }
+        });
+        super.run();
+        console.log(10)
+   
+
+    }
+    draw() {
+        game.drawBackground();
+        this.drawLogin();
+        this.logo.draw();
+    }
+
+    drawLogin() {
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            `Nick: ${this.nick}`,
+            game.canvas.width / 2,
+            game.canvas.height / 2 + 20
+        );
+    }
+
+    end() {
+        game.canvas.removeEventListener("keydown", this.handleKeyDown);
+        super.end();
+    }
+
+    
 }
 
 
@@ -82,7 +130,7 @@ class Menu extends Mode {
 
     handleMouseMove(event) {
         const [x, y] = game.getCursorCoords(event);
-        this.checkButtonHighlight(x, y)
+        this.checkButtonHighlight(x, y);
     }
 
     checkButtonHighlight(x, y) {
@@ -96,7 +144,7 @@ class Menu extends Mode {
             if (button.cursorInside(x, y)) {
                 this.end();
                 game.currentMode = new button.mode(...button.modeArgs);
-                game.currentMode.run()
+                game.currentMode.run();
             }
 
         });
@@ -338,4 +386,4 @@ class ReactionMode extends ModeApi {
     }
 }
 
-export { Menu };
+export { Login };
