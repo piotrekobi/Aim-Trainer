@@ -3,7 +3,7 @@ import { Login } from "./modes";
 const BACKGROUND_COLOR = "#f5ab45"
 
 class Game {
-    constructor() {
+    constructor(currentMode = new Login()) {
         this.canvas = document.getElementById("main-canvas");
         this.canvas.width = window.innerWidth / 1.7;
         this.canvas.height = window.innerHeight / 1.3;
@@ -11,6 +11,7 @@ class Game {
         this.buttonHeight = 60;
         this.ctx = this.canvas.getContext("2d");
         this.nick = null
+        this.currentMode = currentMode
     }
 
     getCursorCoords(event) {
@@ -32,6 +33,5 @@ class Game {
 
 
 var game = new Game();
-game.currentMode = new Login();
 game.currentMode.run();
 export { game };
