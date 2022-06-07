@@ -45,14 +45,87 @@ class Mode {
 class ModeApi extends Mode {
     constructor(mode) {
         super();
-        this.api = new ApiController(API_URL)
-        this.mode = mode
+        this.api = new ApiController(API_URL);
+        this.mode = mode;
     }
 
     end(message_text = null) {
-        this.api.postResult(game.nick, this.mode, this.points)
-        super.end(message_text)
+        this.api.postResult(game.nick, this.mode, this.points);
+        super.end(message_text);
+    }
+}
+
+class Login extends Mode {
+
+    constructor() {
+        super();
+        this.nick = "";
+        console.log('login');
+        this.logo = new Logo();
+        this.startTime = Date.now();
+    }
+
+    run() {
+        window.addEventListener("keydown", (e) => {
+            if (e.key == 'Enter') {
+                this.end()
+            }
+            else if (e.key == "Backspace") {
+                this.nick = this.nick.slice(0, -1);
+            }
+            else if (e.key.length == 1) {
+                if (this.nick.length < 11)
+                    this.nick += e.key
+            }
+        });
+        super.run();
+    }
+
+    draw() {
+        game.drawBackground();
+        this.drawLogin();
+        this.logo.draw();
+    }
+
+    drawLogin() {
+        game.ctx.fillStyle = "black";
+        game.ctx.textAlign = "center";
+        game.ctx.fillText(
+            "Nick:",
+            game.canvas.width / 2,
+            game.canvas.height / 2
+        );
+
+        game.ctx.font = "40px monospace"
+
+        for (let i = -5; i <= 5; i++) {
+            if (i + 5 == this.nick.length) {
+                if (Math.floor((Date.now() - this.startTime) / 500) % 2 == 0) {
+                    continue;
+                }
+            }
+
+            if (i + 5 < this.nick.length) {
+                game.ctx.fillText(
+                    this.nick[i + 5],
+                    game.canvas.width / 2 + game.canvas.width / 25 * i,
+                    game.canvas.height / 3 * 2
+                )
+            }
+            game.ctx.fillText(
+                "_",
+                game.canvas.width / 2 + game.canvas.width / 25 * i,
+                game.canvas.height / 3 * 2
+            );
         }
+    }
+
+    end() {
+        game.canvas.removeEventListener("keydown", this.handleKeyDown);
+        super.end();
+    }
+
+
 }
 
 
@@ -82,7 +155,7 @@ class Menu extends Mode {
 
     handleMouseMove(event) {
         const [x, y] = game.getCursorCoords(event);
-        this.checkButtonHighlight(x, y)
+        this.checkButtonHighlight(x, y);
     }
 
     checkButtonHighlight(x, y) {
@@ -96,7 +169,7 @@ class Menu extends Mode {
             if (button.cursorInside(x, y)) {
                 this.end();
                 game.currentMode = new button.mode(...button.modeArgs);
-                game.currentMode.run()
+                game.currentMode.run();
             }
 
         });
@@ -260,8 +333,8 @@ class FlickMode extends ModeApi {
                     this.points += temp;
                 }
                 this.target = new Target(-1000, -1000, 60, 99999);
-                this.rounds --;
-                if (this.rounds == 0){
+                this.rounds--;
+                if (this.rounds == 0) {
                     this.end(`Your score: ${this.points}`)
                 }
                 this.flickEvent = false;
@@ -338,4 +411,4 @@ class ReactionMode extends ModeApi {
     }
 }
 
-export { Menu };
+export { Login };

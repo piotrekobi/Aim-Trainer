@@ -134,6 +134,91 @@
                     "result": 11
                 }
             ]
+        },
+        {
+            "nick": "Default_Nick",
+            "games": [
+                {
+                    "timestamp": 1654446559,
+                    "mode": 0,
+                    "result": 3
+                },
+                {
+                    "timestamp": 1654446694,
+                    "mode": 3,
+                    "result": 3248
+                },
+                {
+                    "timestamp": 1654446722,
+                    "mode": 2,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654446931,
+                    "mode": 2,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654451739,
+                    "mode": 0,
+                    "result": 27
+                },
+                {
+                    "timestamp": 1654451762,
+                    "mode": 1,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654451773,
+                    "mode": 2,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654451822,
+                    "mode": 3,
+                    "result": 3021
+                },
+                {
+                    "timestamp": 1654457327,
+                    "mode": 2,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654476951,
+                    "mode": 2,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654478435,
+                    "mode": 0,
+                    "result": 2
+                },
+                {
+                    "timestamp": 1654478615,
+                    "mode": 0,
+                    "result": 2
+                },
+                {
+                    "timestamp": 1654478753,
+                    "mode": 0,
+                    "result": 1
+                },
+                {
+                    "timestamp": 1654478852,
+                    "mode": 0,
+                    "result": 1
+                },
+                {
+                    "timestamp": 1654478925,
+                    "mode": 0,
+                    "result": 1
+                },
+                {
+                    "timestamp": 1654479133,
+                    "mode": 0,
+                    "result": 1
+                }
+            ]
         }
     ]
 }
