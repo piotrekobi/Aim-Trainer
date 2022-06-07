@@ -294,6 +294,16 @@
                     "result": 6
                 }
             ]
+        },
+        {
+            "nick": "a",
+            "games": [
+                {
+                    "timestamp": 1654637937,
+                    "mode": 3,
+                    "result": 4135
+                }
+            ]
         }
     ]
 }

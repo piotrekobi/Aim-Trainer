@@ -184,7 +184,8 @@ class Menu extends Mode {
 class RankingMode extends ModeApi {
     constructor() {
         super();
-        this.games = JSON.parse(this.api.getUserDataResponse(game.nick))[game.nick]["games"]
+        this.games = JSON.parse(this.api.getUserDataResponse(game.nick))[game.nick]["games"];
+        this.target = new Target(60,game.canvas.height - 60, 60, 99999);
     }
 
     draw() {
@@ -209,18 +210,27 @@ class RankingMode extends ModeApi {
             game.canvas.height / 2
         );
         for (const [i, modeName] in ["Time", "Survival", "Flick", "Reaction"].entries()) {
-
+            console.log(this.games)
         }
-
+        this.target.draw();
     }
-
-
 
     handleClick(event) {
         const [x, y] = game.getCursorCoords(event);
-
+        if (this.target.hit(x, y)){
+            this.end(`You left ranking`);
+        }
     }
 
+    end() {
+        game.canvas.removeEventListener("click", this.handleClick);
+        game.canvas.removeEventListener("mousemove", this.handleMouseMove);
+        clearInterval(this.drawTimer);
+        if (!(game.currentMode instanceof Menu)) {
+            game.currentMode = new Menu();
+            game.currentMode.run();
+        }
+    }
 }
 
 
