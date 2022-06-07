@@ -60,7 +60,6 @@ class Login extends Mode {
     constructor() {
         super();
         this.nick = "";
-        console.log('login');
         this.logo = new Logo();
         this.startTime = Date.now();
     }
@@ -122,6 +121,7 @@ class Login extends Mode {
 
     end() {
         game.canvas.removeEventListener("keydown", this.handleKeyDown);
+        game.nick = this.nick
         super.end();
     }
 

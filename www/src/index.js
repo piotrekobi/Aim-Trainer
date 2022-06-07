@@ -3,14 +3,14 @@ import { Login } from "./modes";
 const BACKGROUND_COLOR = "#f5ab45"
 
 class Game {
-    constructor(nick = "Default_Nick") {
+    constructor() {
         this.canvas = document.getElementById("main-canvas");
         this.canvas.width = window.innerWidth / 1.7;
         this.canvas.height = window.innerHeight / 1.3;
         this.buttonWidth = this.canvas.width - 100;
         this.buttonHeight = 60;
         this.ctx = this.canvas.getContext("2d");
-        this.nick = nick
+        this.nick = null
     }
 
     getCursorCoords(event) {

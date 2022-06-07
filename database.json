@@ -219,6 +219,41 @@
                     "result": 1
                 }
             ]
+        },
+        {
+            "nick": "aaaa",
+            "games": [
+                {
+                    "timestamp": 1654627254,
+                    "mode": 2,
+                    "result": 462
+                }
+            ]
+        },
+        {
+            "nick": "Majkhillu",
+            "games": [
+                {
+                    "timestamp": 1654627305,
+                    "mode": 1,
+                    "result": 0
+                },
+                {
+                    "timestamp": 1654627357,
+                    "mode": 1,
+                    "result": 0
+                }
+            ]
+        },
+        {
+            "nick": "asdasd",
+            "games": [
+                {
+                    "timestamp": 1654627560,
+                    "mode": 1,
+                    "result": 0
+                }
+            ]
         }
     ]
 }
