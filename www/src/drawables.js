@@ -1,4 +1,4 @@
-import { cursor_inside } from "aim-trainer";
+import { cursor_inside, is_hit } from "aim-trainer";
 import { game } from "./index"
 
 const BUTTON_SPACING = 30;
@@ -63,7 +63,7 @@ class Target {
     }
 
     hit(x, y) {
-        return (Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)) <= this.size * this.sizeRatio)
+        return (is_hit(x, y, this.x, this.y, this.size, this.sizeRatio))
     }
 }
 

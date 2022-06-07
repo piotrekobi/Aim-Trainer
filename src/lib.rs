@@ -18,6 +18,11 @@ pub fn randint(min: i32, max: i32) -> i32 {
 }
 
 #[wasm_bindgen]
+pub fn is_hit(x: f64, y: f64, targetx: f64, targety: f64, size: f64, sizeratio: f64) -> bool {
+    ((targetx - x).powf(2.0)).sqrt() + ((targety - y).powf(2.0)).sqrt() <= size * sizeratio
+}
+
+#[wasm_bindgen]
 pub fn cursor_inside(
     cursor_x: i32,
     cursor_y: i32,
